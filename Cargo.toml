@@ -2,11 +2,16 @@
 name = "obs-cmd"
 version = "0.1.0"
 edition = "2021"
+description = "A minimal command to control obs via obs-websocket"
+authors = ["Luigi Maselli <luigi@grigio.org>"]
+rust-version = "1.69.0"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[[bin]]
+name = "obs-cmd"
 
 [dependencies]
 anyhow = "1.0.71"
 tokio = { version = "1.28.1", features = ["rt-multi-thread", "macros"] }
 obws = "0.11.0"
-
+toml = "0.7.4"
+dirs = "5.0.1"

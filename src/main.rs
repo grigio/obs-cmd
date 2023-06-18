@@ -102,6 +102,30 @@ async fn main() -> Result<()> {
                 }
             }
         }
+        "virtualcam" => {
+            if args.len() < 3 {
+                println!("Usage: ./program virtualcam <command>");
+                return Ok(());
+            }
+            let command = &args[2];
+            match command.as_str() {
+                "start" => {
+                    let res = client.virtual_cam().start().await?;
+                    println!("Result: {:?}", res);
+                }
+                "stop" => {
+                    let res = client.virtual_cam().stop().await?;
+                    println!("Result: {:?}", res);
+                }
+                "toggle" => {
+                    let res = client.virtual_cam().toggle().await?;
+                    println!("Result: {:?}", res);
+                }
+                _ => {
+                    println!("Invalid virtualcam command: {}", command);
+                }
+            }
+        }
         _ => {
             println!("Invalid command: {}", args[1]);
         }

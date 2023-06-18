@@ -2,6 +2,8 @@
 
 I was used to [obs-cli](https://github.com/muesli/obs-cli/pull/64) but it doesn't support `obs-websocket` 5
 
+[![Latest Release](https://img.shields.io/github/release/grigio/obs-cmd.svg)](https://github.com/grigio/obs-cmd/releases)
+
 ### Usage
 
 Just a minimal API is supported

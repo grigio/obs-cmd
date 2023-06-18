@@ -11,6 +11,7 @@ obs-cmd scene switch <scene>
 obs-cmd scene switch @cam-front
 obs-cmd recording toggle
 obs-cmd streaming start
+obs-cmd virtualcam start
 obs-cmd info
 ```
 

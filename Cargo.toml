@@ -8,6 +8,8 @@ rust-version = "1.69.0"
 
 [[bin]]
 name = "obs-cmd"
+version = "v0.1.1"
+
 
 [dependencies]
 anyhow = "1.0.71"

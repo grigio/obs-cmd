@@ -75,6 +75,33 @@ async fn main() -> Result<()> {
                 }
             }
         }
+        "stream" => {
+            if args.len() < 3 {
+                println!("Usage: ./program streaming <command>");
+                return Ok(());
+            }
+            let command = &args[2];
+            match command.as_str() {
+                "start" => {
+                    let res = client.streaming().start().await?;
+                    println!("Streaming started");
+                    println!("Result: {:?}", res);
+                }
+                "stop" => {
+                    let res = client.streaming().stop().await?;
+                    println!("Streaming stopped");
+                    println!("Result: {:?}", res);
+                }
+                "toggle" => {
+                    let res = client.streaming().toggle().await?;
+                    println!("Streaming toggled");
+                    println!("Result: {:?}", res);
+                }
+                _ => {
+                    println!("Invalid streaming command: {}", command);
+                }
+            }
+        }
         _ => {
             println!("Invalid command: {}", args[1]);
         }

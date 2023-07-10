@@ -75,6 +75,38 @@ async fn main() -> Result<()> {
                 }
             }
         }
+        "replay" => {
+            if args.len() < 3 {
+                println!("Usage: ./program replay <command>");
+                return Ok(());
+            }
+            let command = &args[2];
+            match command.as_str() {
+                "start" => {
+                    let res = client.replay_buffer().start().await?;
+                    println!("Replay Buffer started");
+                    println!("Result: {:?}", res);
+                }
+                "stop" => {
+                    let res = client.replay_buffer().stop().await?;
+                    println!("Replay Buffer stopped");
+                    println!("Result: {:?}", res);
+                }
+                "toggle" => {
+                    let res = client.replay_buffer().toggle().await?;
+                    println!("Replay Buffer toggled");
+                    println!("Result: {:?}", res);
+                }
+                "save" => {
+                    let res = client.replay_buffer().save().await?;
+                    println!("Buffer saved");
+                    println!("Result: {:?}", res);
+                }
+                _ => {
+                    println!("Invalid replay command: {}", command);
+                }
+            }
+        }
         "stream" => {
             if args.len() < 3 {
                 println!("Usage: ./program streaming <command>");

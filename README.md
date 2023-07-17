@@ -63,3 +63,13 @@ Result: Ok(())
 ➜ obs-cmd info
 Version: Version { obs_version: Version { major: 29, minor: 1, patch: 1 }, obs_web_socket_version: Version { major: 5, minor: 2, patch: 2 }, rpc_version: 1, available_requests: ..
 ```
+
+### Donations
+
+Donations are welcome and will go towards further development of this project
+
+```
+monero:88LyqYXn4LdCVDtPWKuton9hJwbo8ZduNEGuARHGdeSJ79BBYWGpMQR8VGWxGDKtTLLM6E9MJm8RvW9VMUgCcSXu19L9FSv
+bitcoin:bc1q6mh77hfv8x8pa0clzskw6ndysujmr78j6se025
+lightning:techonsapevole@getalby.com
+```

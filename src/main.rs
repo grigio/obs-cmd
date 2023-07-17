@@ -41,10 +41,7 @@ async fn main() -> Result<()> {
         }
         "scene" => {
             let scene_name = &args[3];
-            let res = client
-                .scenes()
-                .set_current_program_scene(scene_name)
-                .await;
+            let res = client.scenes().set_current_program_scene(scene_name).await;
             println!("Set current scene: {}", scene_name);
             println!("Result: {:?}", res);
         }

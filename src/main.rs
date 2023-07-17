@@ -44,7 +44,7 @@ async fn main() -> Result<()> {
             let res = client
                 .scenes()
                 .set_current_program_scene(scene_name)
-                .await?;
+                .await;
             println!("Set current scene: {}", scene_name);
             println!("Result: {:?}", res);
         }
@@ -56,17 +56,17 @@ async fn main() -> Result<()> {
             let command = &args[2];
             match command.as_str() {
                 "start" => {
-                    let res = client.recording().start().await?;
+                    let res = client.recording().start().await;
                     println!("Recording started");
                     println!("Result: {:?}", res);
                 }
                 "stop" => {
-                    let res = client.recording().stop().await?;
+                    let res = client.recording().stop().await;
                     println!("Recording stopped");
                     println!("Result: {:?}", res);
                 }
                 "toggle" => {
-                    let res = client.recording().toggle().await?;
+                    let res = client.recording().toggle().await;
                     println!("Recording toggled");
                     println!("Result: {:?}", res);
                 }
@@ -83,12 +83,12 @@ async fn main() -> Result<()> {
             let command = &args[2];
             match command.as_str() {
                 "start" => {
-                    let res = client.replay_buffer().start().await?;
+                    let res = client.replay_buffer().start().await;
                     println!("Replay Buffer started");
                     println!("Result: {:?}", res);
                 }
                 "stop" => {
-                    let res = client.replay_buffer().stop().await?;
+                    let res = client.replay_buffer().stop().await;
                     println!("Replay Buffer stopped");
                     println!("Result: {:?}", res);
                 }
@@ -98,7 +98,7 @@ async fn main() -> Result<()> {
                     println!("Result: {:?}", res);
                 }
                 "save" => {
-                    let res = client.replay_buffer().save().await?;
+                    let res = client.replay_buffer().save().await;
                     println!("Buffer saved");
                     println!("Result: {:?}", res);
                 }
@@ -115,12 +115,12 @@ async fn main() -> Result<()> {
             let command = &args[2];
             match command.as_str() {
                 "start" => {
-                    let res = client.streaming().start().await?;
+                    let res = client.streaming().start().await;
                     println!("Streaming started");
                     println!("Result: {:?}", res);
                 }
                 "stop" => {
-                    let res = client.streaming().stop().await?;
+                    let res = client.streaming().stop().await;
                     println!("Streaming stopped");
                     println!("Result: {:?}", res);
                 }
@@ -142,11 +142,11 @@ async fn main() -> Result<()> {
             let command = &args[2];
             match command.as_str() {
                 "start" => {
-                    let res = client.virtual_cam().start().await?;
+                    let res = client.virtual_cam().start().await;
                     println!("Result: {:?}", res);
                 }
                 "stop" => {
-                    let res = client.virtual_cam().stop().await?;
+                    let res = client.virtual_cam().stop().await;
                     println!("Result: {:?}", res);
                 }
                 "toggle" => {

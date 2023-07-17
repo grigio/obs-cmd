@@ -1,0 +1,63 @@
+name: release
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+*'
+
+jobs:
+
+  desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [debian-12]
+        include:
+          - os: debian-12
+            artifact_name: ./target/release/obs-cmd
+            asset_name: obs-cmd-linux-amd64
+          
+          # - os: windows-latest
+          #   artifact_name: ./target/release/obs-cmd.exe
+          #   asset_name: obs-cmd-windows-amd64.exe
+          
+          # - os: macos-latest
+          #   artifact_name: ./target/release/obs-cmd
+          #   asset_name: obs-cmd-macos-amd64
+
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v3
+
+    - name: Build
+      run: cargo build --release
+
+    - name: Upload binaries
+      uses: svenstaro/upload-release-action@2.3.0
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: ${{ matrix.artifact_name }}
+        asset_name: ${{ matrix.asset_name }}
+        tag: ${{ github.ref }}
+
+    
+  embedded:
+    runs-on: debian-12
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v3
+    
+    - name: Install cross
+      run: cargo install cross
+
+    - name: Build for armv7-gnueabihf
+      run: cross build --target armv7-unknown-linux-gnueabihf --release
+
+    - name: Upload binaries to release
+      uses: svenstaro/upload-release-action@2.3.0
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: target/armv7-unknown-linux-gnueabihf/release/obs-cmd
+        asset_name: obs-cmd-armv7
+        tag: ${{ github.ref }}

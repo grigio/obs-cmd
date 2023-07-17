@@ -2,7 +2,7 @@
 
 I was used to [obs-cli](https://github.com/muesli/obs-cli/pull/64) but it doesn't support `obs-websocket` 5
 
-[![Latest Release](https://img.shields.io/github/release/grigio/obs-cmd.svg)](https://github.com/grigio/obs-cmd/releases)
+[![release](https://github.com/grigio/obs-cmd/actions/workflows/release.yml/badge.svg)](https://github.com/grigio/obs-cmd/actions/workflows/release.yml)
 
 ### Usage
 
@@ -19,7 +19,26 @@ obs-cmd replay save
 obs-cmd info
 ```
 
-### Installation
+### Installation 
+
+Download `obs-cmd`, pick the correct binary for your OS, example `obs-cmd-linux-amd64`
+
+https://github.com/grigio/obs-cmd/releases/latest
+
+type in the terminal:
+
+```
+chmod +x obs-cmd-linux-amd64 && sudo mv obs-cmd-linux-amd64 /usr/local/bin/obs-cmd
+```
+
+Or run this commands to build the binary from source and install it
+
+```
+cargo build --release
+sudo ln -s $PWD/target/release/obs-cmd /usr/local/bin/
+```
+
+### Configuration
 
 Create the config file in `~/.config/obs-cmd.toml`
 
@@ -30,9 +49,17 @@ OBS_WS_PASSWORD = "secret"
 
 ```
 
-Run this commands to build the binary and install it
+Open OBS Studio and set your `OBS_WS_PASSWORD` in `Tools > Websocker Server Settings`
+
+
+### Usage
 
 ```
-cargo build --release
-sudo ln -s $PWD/target/release/obs-cmd /usr/local/bin/
+➜ obs-cmd recording start 
+Recording started
+Result: Ok(())
+➜ obs-cmd recording stop 
+
+➜ obs-cmd info
+Version: Version { obs_version: Version { major: 29, minor: 1, patch: 1 }, obs_web_socket_version: Version { major: 5, minor: 2, patch: 2 }, rpc_version: 1, available_requests: ..
 ```

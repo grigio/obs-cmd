@@ -34,7 +34,7 @@ jobs:
       run: cargo build --release
 
     - name: Upload binaries
-      uses: svenstaro/upload-release-action@2.6.1
+      uses: svenstaro/upload-release-action@2.7.0
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: ${{ matrix.artifact_name }}
@@ -55,7 +55,7 @@ jobs:
       run: cross build --target armv7-unknown-linux-gnueabihf --release
 
     - name: Upload binaries to release
-      uses: svenstaro/upload-release-action@2.6.1
+      uses: svenstaro/upload-release-action@2.7.0
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: target/armv7-unknown-linux-gnueabihf/release/obs-cmd

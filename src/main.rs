@@ -104,7 +104,7 @@ async fn main() -> Result<()> {
                 }
             }
         }
-        "stream" => {
+        "streaming" => {
             if args.len() < 3 {
                 println!("Usage: ./program streaming <command>");
                 return Ok(());

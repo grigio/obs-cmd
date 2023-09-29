@@ -1,5 +1,5 @@
 use anyhow::{anyhow, Result};
-use obws::Client;
+use obws::{requests::filters::SetEnabled, Client};
 use std::fs;
 use toml::Value;
 
@@ -154,6 +154,33 @@ async fn main() -> Result<()> {
                     println!("Invalid virtualcam command: {}", command);
                 }
             }
+        }
+        "filter" => {
+            if args.len() < 5 {
+                println!("Usage: ./program filter <command> <source-name> <filter-name>");
+                return Ok(());
+            }
+            let command = &args[2];
+            let source = &args[3];
+            let filter = &args[4];
+            let enabled: bool = match command.as_str() {
+                "enable" => true,
+                "disable" => false,
+                "toggle" => !client.filters().get(source, filter).await?.enabled,
+                _ => {
+                    println!("Invalid filter command: {}", command);
+                    return Ok(());
+                }
+            };
+            let res = client
+                .filters()
+                .set_enabled(SetEnabled {
+                    source,
+                    filter,
+                    enabled,
+                })
+                .await;
+            println!("Result: {:?}", res);
         }
         _ => {
             println!("Invalid command: {}", args[1]);

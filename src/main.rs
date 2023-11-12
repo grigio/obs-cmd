@@ -49,7 +49,6 @@ async fn main() -> Result<()> {
             let input_name = &args[2];
             let res = client.inputs().toggle_mute(input_name).await;
             println!("Result: {:?}", res);
-
         }
         "recording" => {
             if args.len() < 3 {

@@ -45,6 +45,12 @@ async fn main() -> Result<()> {
             println!("Set current scene: {}", scene_name);
             println!("Result: {:?}", res);
         }
+        "toggle-mute" => {
+            let input_name = &args[2];
+            let res = client.inputs().toggle_mute(input_name).await;
+            println!("Result: {:?}", res);
+
+        }
         "recording" => {
             if args.len() < 3 {
                 println!("Usage: ./program recording <command>");

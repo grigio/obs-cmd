@@ -4,24 +4,10 @@ I was used to [obs-cli](https://github.com/muesli/obs-cli/pull/64) but it doesn'
 
 [![release](https://github.com/grigio/obs-cmd/actions/workflows/release.yml/badge.svg)](https://github.com/grigio/obs-cmd/actions/workflows/release.yml)
 
-### Usage
 
-Just a minimal API is supported
+## Installation 
 
-```
-obs-cmd scene switch <scene>
-obs-cmd scene switch @cam-front
-obs-cmd toggle-mute Mic/Aux
-obs-cmd recording toggle
-obs-cmd streaming start
-obs-cmd virtualcam start
-obs-cmd replay toggle
-obs-cmd replay save
-obs-cmd info
-```
-
-### Installation 
-
+### Using the provided Binaries
 Download `obs-cmd`, pick the correct binary for your OS, example `obs-cmd-linux-amd64`
 
 https://github.com/grigio/obs-cmd/releases/latest
@@ -32,14 +18,56 @@ type in the terminal:
 chmod +x obs-cmd-linux-amd64 && sudo mv obs-cmd-linux-amd64 /usr/local/bin/obs-cmd
 ```
 
-Or run this commands to build the binary from source and install it
+### Installing From Source
+First ensure that Rust is installed on your system. Clone the repo to your local system:
+
+```
+git clone https://github.com/grigio/obs-cmd.git
+```
+
+Next `cd` into the cloned directory then at the top-level of the directory run:
 
 ```
 cargo build --release
-sudo ln -s $PWD/target/release/obs-cmd /usr/local/bin/
 ```
 
-### Configuration
+Once the build is complete you may move the produce binary into an approriate binary location, such as `/usr/local/bin`:
+
+```
+sudo cp target/release/obs-cmd /usr/local/bin/obs-cmd
+```
+
+### Installing on Arch Linux
+The `obs-cmd` package is maintained on the [Arch User Repository](https://aur.archlinux.org/packages/obs-cmd). 
+
+Ensure that [rust](https://archlinux.org/packages/extra/x86_64/rust/) is installed for access to `cargo`.
+
+To install `obs-cmd` you can either use an AUR helper of your choice such as [yay](https://aur.archlinux.org/packages/yay) or [aurman](https://aur.archlinux.org/packages/aurman) or download the PKGBUILD directly and use makepkg to produce the finished package:
+```
+wget https://aur.archlinux.org/cgit/aur.git/snapshot/obs-cmd.tar.gz
+```
+
+Untar the .tar.gz file:
+```
+tar xvzf obs-cmd.tar.gz
+```
+
+`cd` into the directory:
+```
+cd obs-cmd
+```
+
+Run makepkg to produce the installable package:
+```
+makepkg -s
+```
+
+And finally use pacman to install the produced package (*your version number may vary*):
+```
+sudo pacman -U obs-cmd-0.15.3-1-x86_64.pkg.tar.zst
+```
+
+## Configuration
 
 Create the config file in `~/.config/obs-cmd.toml`
 
@@ -53,19 +81,34 @@ OBS_WS_PASSWORD = "secret"
 Open OBS Studio and set your `OBS_WS_PASSWORD` in `Tools > Websocker Server Settings`
 
 
-### Usage
+## Usage
+
+### Supported Command Options
 
 ```
-➜ obs-cmd recording start 
+obs-cmd scene switch <scene>
+obs-cmd scene switch @cam-front
+obs-cmd toggle-mute Mic/Aux
+obs-cmd recording toggle
+obs-cmd streaming start
+obs-cmd virtualcam start
+obs-cmd replay toggle
+obs-cmd replay save
+obs-cmd info
+```
+
+### Example Usage
+```
+$ obs-cmd recording start 
 Recording started
 Result: Ok(())
-➜ obs-cmd recording stop 
+$ obs-cmd recording stop 
 
-➜ obs-cmd info
+$ obs-cmd info
 Version: Version { obs_version: Version { major: 29, minor: 1, patch: 1 }, obs_web_socket_version: Version { major: 5, minor: 2, patch: 2 }, rpc_version: 1, available_requests: ..
 ```
 
-### Donations
+## Donations
 
 Donations are welcome and will go towards further development of this project
 

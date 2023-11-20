@@ -9,6 +9,7 @@ I was used to [obs-cli](https://github.com/muesli/obs-cli/pull/64) but it doesn'
 Just a minimal API is supported
 
 ```
+obs-cmd --help
 obs-cmd scene switch <scene>
 obs-cmd scene switch @cam-front
 obs-cmd toggle-mute Mic/Aux
@@ -84,35 +85,6 @@ And finally use pacman to install the produced package (*your version number may
 sudo pacman -U obs-cmd-0.15.3-1-x86_64.pkg.tar.zst
 ```
 
-## Configuration
-
-Create the config file in `~/.config/obs-cmd.toml`
-
-```toml
-# file: ~/.config/obs-cmd.toml
-
-OBS_WS_PASSWORD = "secret"
-
-```
-
-Open OBS Studio and set your `OBS_WS_PASSWORD` in `Tools > Websocker Server Settings`
-
-
-## Usage
-
-### Supported Command Options
-
-```
-obs-cmd scene switch <scene>
-obs-cmd scene switch @cam-front
-obs-cmd toggle-mute Mic/Aux
-obs-cmd recording toggle
-obs-cmd streaming start
-obs-cmd virtualcam start
-obs-cmd replay toggle
-obs-cmd replay save
-obs-cmd info
-```
 
 ### Example Usage
 ```

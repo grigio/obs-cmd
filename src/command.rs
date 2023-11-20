@@ -16,28 +16,33 @@ impl FromStr for ObsWebsocket {
         match Url::parse(s) {
             Ok(unvalidated_websocket) => {
                 if unvalidated_websocket.scheme() != "obsws" {
-                    return Err("Invalid URL format, use the format obsws://hostname:port/password");
+                    return Err(
+                        "Invalid URL format, use the format obsws://hostname:port/password",
+                    );
                 }
 
                 let hostname = unvalidated_websocket.host().unwrap().to_string();
 
-                let port = match unvalidated_websocket.port() {
-                    Some(port) => port,
-                    None => return Err("Please specify a port in the format obsws://hostname:port/password"),
-                };
+                let port =
+                    match unvalidated_websocket.port() {
+                        Some(port) => port,
+                        None => return Err(
+                            "Please specify a port in the format obsws://hostname:port/password",
+                        ),
+                    };
 
                 let password = match unvalidated_websocket.path() {
                     "" => None,
                     _ => Some(unvalidated_websocket.path().to_string()),
                 };
 
-               Ok(ObsWebsocket {
-                    hostname: hostname,
-                    port: port,
-                    password: password,
+                Ok(ObsWebsocket {
+                    hostname,
+                    port,
+                    password,
                 })
-            },
-            Err(_) => return Err("Invalid URL format, use the format obsws://hostname:port/password"),
+            }
+            Err(_) => Err("Invalid URL format, use the format obsws://hostname:port/password"),
         }
     }
 }
@@ -93,15 +98,15 @@ pub enum Commands {
 
     #[clap(subcommand)]
     VirtualCamera(VirtualCamera),
-    
+
     #[clap(subcommand)]
     Streaming(Streaming),
 
     #[clap(subcommand)]
     Recording(Recording),
 
-    ToggleMute{
-        device: String
+    ToggleMute {
+        device: String,
     },
 
     Filter {

@@ -27,7 +27,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             println!("Version: {:?}", version);
         }
 
-        Commands::Recording (action) => {
+        Commands::Recording(action) => {
             use Recording::*;
             println!("Recording {:?}", action);
 

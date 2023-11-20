@@ -18,6 +18,7 @@ obs-cmd virtualcam start
 obs-cmd replay toggle
 obs-cmd replay save
 obs-cmd info
+obs-cmd --obsws obsws://localhost:4455/secret info # You can override the default `obsws` url
 ```
 
 ### Installation 

@@ -1,62 +1,91 @@
-use anyhow::{anyhow, Result};
+use clap::{Parser, Subcommand};
 use obws::{requests::filters::SetEnabled, Client};
-use std::fs;
-use toml::Value;
 
-#[tokio::main]
-async fn main() -> Result<()> {
-    let args: Vec<String> = std::env::args().collect();
-    if args.len() < 2 {
-        println!("Usage: ./program <command>");
-        return Ok(());
+#[derive(Parser)]
+#[clap(author, version, about, long_about = None)]
+struct Cli {
+    #[clap(short, long)]
+    obsws: Option<String>,
+    #[clap(subcommand)]
+    command: Commands,
+}
+
+#[derive(Subcommand)]
+enum Commands {
+    Info,
+    Scene {
+        switch_placeholder: String, // NOTE: just for args positioning
+        scene_name: String,
+    },
+    Replay {
+        action: String,
+    },
+    Virtualcam {
+        action: String,
+    },
+    Streaming {
+        action: String,
+    },
+    Recording {
+        action: String,
+    },
+    ToggleMute {
+        device: String,
+    },
+    Filter {
+        command: String,
+        source: String,
+        filter: String,
+    },
+}
+
+fn parse_obsws(input: &str) -> Result<(&str, &str, u16), &'static str> {
+    if !input.starts_with("obsws://") {
+        return Err("Invalid URL format, use the format: obsws://hostname:port/password");
     }
 
-    // Determine the configuration directory
-    let config_dir =
-        dirs::config_dir().ok_or_else(|| anyhow!("Unable to determine config directory"))?;
+    let without_prefix = &input[8..];
+    let parts: Vec<&str> = without_prefix.split([':', '/'].as_ref()).collect();
 
-    // Read the TOML file
-    let config_file_path = config_dir.join("obs-cmd.toml");
-    let config_content = fs::read_to_string(&config_file_path)
-        .map_err(|_| anyhow!("Unable to read the TOML file: {:?}", &config_file_path))?;
+    if parts.len() < 3 {
+        return Err("Invalid format");
+    }
 
-    // Parse the TOML content
-    let config: Value =
-        toml::from_str(&config_content).map_err(|_| anyhow!("Unable to parse the TOML content"))?;
+    let hostname = parts[0];
+    let port = parts[1].parse().map_err(|_| "Invalid port number")?;
+    let password = parts[2];
 
-    // Extract the value of OBS_WS_PASSWORD
-    let obs_ws_password = config
-        .get("OBS_WS_PASSWORD")
-        .and_then(|v| v.as_str())
-        .ok_or_else(|| anyhow!("OBS_WS_PASSWORD not found in the TOML file"))?;
+    Ok((hostname, password, port))
+}
 
-    // TODO: URL like ws://pass@localhost:4455?
-    let client = Client::connect("localhost", 4455, Some(obs_ws_password)).await?;
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let cli: Cli = Cli::parse();
 
-    match args[1].as_str() {
-        "info" => {
-            // CLI info
+    let obs_ws_url = cli
+        .obsws
+        .unwrap_or_else(|| String::from("obsws://localhost:4455/secret"));
+
+    let (hostname, password, port) = parse_obsws(&obs_ws_url)?;
+    let client = Client::connect(hostname, port, Some(password)).await?;
+
+    match &cli.command {
+        Commands::Scene {
+            switch_placeholder,
+            scene_name,
+        } => {
+            // let scene_name = &args[3];
+            let res = client.scenes().set_current_program_scene(scene_name).await;
+            println!("Set current scene: {} {}", switch_placeholder, scene_name);
+            println!("Result: {:?}", res);
+        }
+        Commands::Info => {
             let version = client.general().version().await?;
             println!("Version: {:?}", version);
         }
-        "scene" => {
-            let scene_name = &args[3];
-            let res = client.scenes().set_current_program_scene(scene_name).await;
-            println!("Set current scene: {}", scene_name);
-            println!("Result: {:?}", res);
-        }
-        "toggle-mute" => {
-            let input_name = &args[2];
-            let res = client.inputs().toggle_mute(input_name).await;
-            println!("Result: {:?}", res);
-        }
-        "recording" => {
-            if args.len() < 3 {
-                println!("Usage: ./program recording <command>");
-                return Ok(());
-            }
-            let command = &args[2];
-            match command.as_str() {
+        Commands::Recording { action } => {
+            println!("Recording {:?}", action);
+            match action.as_str() {
                 "start" => {
                     let res = client.recording().start().await;
                     println!("Recording started");
@@ -73,17 +102,56 @@ async fn main() -> Result<()> {
                     println!("Result: {:?}", res);
                 }
                 _ => {
-                    println!("Invalid recording command: {}", command);
+                    println!("Invalid recording command: {}", action);
                 }
             }
         }
-        "replay" => {
-            if args.len() < 3 {
-                println!("Usage: ./program replay <command>");
-                return Ok(());
+        Commands::Streaming { action } => {
+            println!("Streaming {:?}", action);
+            match action.as_str() {
+                "start" => {
+                    let res = client.streaming().start().await;
+                    println!("Streaming started");
+                    println!("Result: {:?}", res);
+                }
+                "stop" => {
+                    let res = client.streaming().stop().await;
+                    println!("Streaming stopped");
+                    println!("Result: {:?}", res);
+                }
+                "toggle" => {
+                    let res = client.streaming().toggle().await?;
+                    println!("Streaming toggled");
+                    println!("Result: {:?}", res);
+                }
+                _ => {
+                    println!("Invalid streaming command: {}", action);
+                }
             }
-            let command = &args[2];
-            match command.as_str() {
+        }
+        Commands::Virtualcam { action } => {
+            println!("Virtualcam {:?}", action);
+            match action.as_str() {
+                "start" => {
+                    let res = client.virtual_cam().start().await;
+                    println!("Result: {:?}", res);
+                }
+                "stop" => {
+                    let res = client.virtual_cam().stop().await;
+                    println!("Result: {:?}", res);
+                }
+                "toggle" => {
+                    let res = client.virtual_cam().toggle().await?;
+                    println!("Result: {:?}", res);
+                }
+                _ => {
+                    println!("Invalid virtualcam command: {}", action);
+                }
+            }
+        }
+        Commands::Replay { action } => {
+            println!("Replay {:?}", action);
+            match action.as_str() {
                 "start" => {
                     let res = client.replay_buffer().start().await;
                     println!("Replay Buffer started");
@@ -105,69 +173,23 @@ async fn main() -> Result<()> {
                     println!("Result: {:?}", res);
                 }
                 _ => {
-                    println!("Invalid replay command: {}", command);
+                    println!("Invalid replay command: {}", action);
                 }
             }
         }
-        "streaming" => {
-            if args.len() < 3 {
-                println!("Usage: ./program streaming <command>");
-                return Ok(());
-            }
-            let command = &args[2];
-            match command.as_str() {
-                "start" => {
-                    let res = client.streaming().start().await;
-                    println!("Streaming started");
-                    println!("Result: {:?}", res);
-                }
-                "stop" => {
-                    let res = client.streaming().stop().await;
-                    println!("Streaming stopped");
-                    println!("Result: {:?}", res);
-                }
-                "toggle" => {
-                    let res = client.streaming().toggle().await?;
-                    println!("Streaming toggled");
-                    println!("Result: {:?}", res);
-                }
-                _ => {
-                    println!("Invalid streaming command: {}", command);
-                }
-            }
+        Commands::ToggleMute { device } => {
+            println!("Toggle mute device: {:?}  ", device);
+
+            let res = client.inputs().toggle_mute(device).await;
+            println!("Result: {:?}", res);
         }
-        "virtualcam" => {
-            if args.len() < 3 {
-                println!("Usage: ./program virtualcam <command>");
-                return Ok(());
-            }
-            let command = &args[2];
-            match command.as_str() {
-                "start" => {
-                    let res = client.virtual_cam().start().await;
-                    println!("Result: {:?}", res);
-                }
-                "stop" => {
-                    let res = client.virtual_cam().stop().await;
-                    println!("Result: {:?}", res);
-                }
-                "toggle" => {
-                    let res = client.virtual_cam().toggle().await?;
-                    println!("Result: {:?}", res);
-                }
-                _ => {
-                    println!("Invalid virtualcam command: {}", command);
-                }
-            }
-        }
-        "filter" => {
-            if args.len() < 5 {
-                println!("Usage: ./program filter <command> <source-name> <filter-name>");
-                return Ok(());
-            }
-            let command = &args[2];
-            let source = &args[3];
-            let filter = &args[4];
+        Commands::Filter {
+            command,
+            source,
+            filter,
+        } => {
+            println!("Filter: {:?} {:?} {:?}", command, source, filter);
+
             let enabled: bool = match command.as_str() {
                 "enable" => true,
                 "disable" => false,
@@ -186,9 +208,6 @@ async fn main() -> Result<()> {
                 })
                 .await;
             println!("Result: {:?}", res);
-        }
-        _ => {
-            println!("Invalid command: {}", args[1]);
         }
     }
 

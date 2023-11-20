@@ -8,8 +8,14 @@ use obws::{requests::filters::SetEnabled, Client};
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cli = Cli::parse();
 
-    let obs_ws_url = cli.websocket;
-    let client = Client::connect(obs_ws_url.hostname, obs_ws_url.port, obs_ws_url.password).await?;
+    let client = match cli.websocket {
+        Some(ObsWebsocket {
+            hostname,
+            port,
+            password,
+        }) => Client::connect(hostname, port, password).await?,
+        None => Client::connect("localhost", 4455, Some("secret")).await?,
+    };
 
     match &cli.command {
         Commands::Scene {

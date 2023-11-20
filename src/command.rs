@@ -2,7 +2,7 @@ use clap::{Parser, Subcommand};
 use std::str::FromStr;
 use url::Url;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct ObsWebsocket {
     pub hostname: String,
     pub port: u16,
@@ -33,7 +33,12 @@ impl FromStr for ObsWebsocket {
 
                 let password = match unvalidated_websocket.path() {
                     "" => None,
-                    _ => Some(unvalidated_websocket.path().to_string()),
+                    _ => {
+                        let mut pass = unvalidated_websocket.path().to_string();
+                        // Otherwise the `/` part of the password in the URL is included.
+                        let _ = pass.remove(0);
+                        Some(pass)
+                    }
                 };
 
                 Ok(ObsWebsocket {
@@ -80,7 +85,9 @@ pub enum Recording {
 #[clap(author, version, about, long_about = None)]
 pub struct Cli {
     #[clap(short, long)]
-    pub websocket: ObsWebsocket,
+    /// The default websocket URL is `obsws://localhost:4455/secret`
+    /// if this argument is not provided
+    pub websocket: Option<ObsWebsocket>,
     #[clap(subcommand)]
     pub command: Commands,
 }

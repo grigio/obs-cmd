@@ -19,9 +19,10 @@ obs-cmd virtualcam start
 obs-cmd replay toggle
 obs-cmd replay save
 obs-cmd info
+obs-cmd --websocket obsws://localhost:4455/secret info # You can override the default `obsws` url
 ```
 
-Remember to add the URL to your OBS websocket, which can be found in OBS -> Tools -> WebSocket Server Settings. `localhost` for the hostname will work for most, instead of the full IP address.
+You can override the websocket URL, which can be found in OBS -> Tools -> WebSocket Server Settings. `localhost` for the hostname will work for most, instead of the full IP address.
 
 ### Installation 
 

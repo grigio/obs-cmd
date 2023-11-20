@@ -1,0 +1,112 @@
+use clap::{Parser, Subcommand};
+use std::str::FromStr;
+use url::Url;
+
+#[derive(Clone)]
+pub struct ObsWebsocket {
+    pub hostname: String,
+    pub port: u16,
+    pub password: Option<String>,
+}
+
+impl FromStr for ObsWebsocket {
+    type Err = &'static str;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match Url::parse(s) {
+            Ok(unvalidated_websocket) => {
+                if unvalidated_websocket.scheme() != "obsws" {
+                    return Err("Invalid URL format, use the format obsws://hostname:port/password");
+                }
+
+                let hostname = unvalidated_websocket.host().unwrap().to_string();
+
+                let port = match unvalidated_websocket.port() {
+                    Some(port) => port,
+                    None => return Err("Please specify a port in the format obsws://hostname:port/password"),
+                };
+
+                let password = match unvalidated_websocket.path() {
+                    "" => None,
+                    _ => Some(unvalidated_websocket.path().to_string()),
+                };
+
+               Ok(ObsWebsocket {
+                    hostname: hostname,
+                    port: port,
+                    password: password,
+                })
+            },
+            Err(_) => return Err("Invalid URL format, use the format obsws://hostname:port/password"),
+        }
+    }
+}
+
+#[derive(Subcommand, Clone, Debug)]
+pub enum Replay {
+    Start,
+    Stop,
+    Toggle,
+    Save,
+}
+
+#[derive(Subcommand, Clone, Debug)]
+pub enum VirtualCamera {
+    Start,
+    Stop,
+    Toggle,
+}
+
+#[derive(Subcommand, Clone, Debug)]
+pub enum Streaming {
+    Start,
+    Stop,
+    Toggle,
+}
+
+#[derive(Subcommand, Clone, Debug)]
+pub enum Recording {
+    Start,
+    Stop,
+    Toggle,
+}
+
+#[derive(Parser)]
+#[clap(author, version, about, long_about = None)]
+pub struct Cli {
+    #[clap(short, long)]
+    pub websocket: ObsWebsocket,
+    #[clap(subcommand)]
+    pub command: Commands,
+}
+
+#[derive(Subcommand)]
+pub enum Commands {
+    Info,
+    Scene {
+        switch_placeholder: String, // NOTE: just for args positioning
+        scene_name: String,
+    },
+
+    #[clap(subcommand)]
+    Replay(Replay),
+
+    #[clap(subcommand)]
+    VirtualCamera(VirtualCamera),
+    
+    #[clap(subcommand)]
+    Streaming(Streaming),
+
+    #[clap(subcommand)]
+    Recording(Recording),
+
+    ToggleMute{
+        device: String
+    },
+
+    Filter {
+        command: String,
+        source: String,
+        filter: String,
+    },
+}

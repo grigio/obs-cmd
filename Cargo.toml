@@ -13,5 +13,6 @@ name = "obs-cmd"
 tokio = { version = "1.28.1", features = ["rt-multi-thread", "macros"] }
 obws = "0.11.0"
 clap = { version = "4.4.8", features = ["derive"] }
+url = "2.4.1"
 
 

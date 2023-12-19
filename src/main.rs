@@ -28,6 +28,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             println!("Result: {:?}", res);
         }
 
+        Commands::SceneCollection {
+            switch_placeholder,
+            scene_collection_name,
+        } => {
+            // let scene_name = &args[3];
+            let res = client.scene_collections().set_current(scene_collection_name).await;
+            println!("Set current scene collection: {} {}", switch_placeholder, scene_collection_name);
+            println!("Result: {:?}", res);
+        }
+
         Commands::Info => {
             let version = client.general().version().await?;
             println!("Version: {:?}", version);

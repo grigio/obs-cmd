@@ -125,4 +125,11 @@ pub enum Commands {
         source: String,
         filter: String,
     },
+
+    SceneItem {
+        command: String,
+        scene: String,
+        source: String,
+    }
+
 }

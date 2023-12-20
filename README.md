@@ -13,7 +13,7 @@ obs-cmd --help
 obs-cmd scene switch <scene>
 obs-cmd scene switch @cam-front
 obs-cmd scene-collection switch <collection>
-obs-cmd scene-item toggle <item>
+obs-cmd scene-item toggle <scene> <item>
 obs-cmd toggle-mute Mic/Aux
 obs-cmd recording toggle
 obs-cmd streaming start

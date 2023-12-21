@@ -99,6 +99,10 @@ pub enum Commands {
         switch_placeholder: String, // NOTE: just for args positioning
         scene_name: String,
     },
+    SceneCollection {
+        switch_placeholder: String, // NOTE: just for args positioning
+        scene_collection_name: String,
+    },
 
     #[clap(subcommand)]
     Replay(Replay),
@@ -121,4 +125,11 @@ pub enum Commands {
         source: String,
         filter: String,
     },
+
+    SceneItem {
+        command: String,
+        scene: String,
+        source: String,
+    }
+
 }

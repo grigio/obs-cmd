@@ -2,7 +2,9 @@ mod command;
 use command::*;
 
 use clap::Parser;
-use obws::{requests::filters::SetEnabled, Client};
+use obws::{requests::filters::SetEnabled as SetEnabledFilter, Client};
+use obws::{requests::scene_items::SetEnabled as SetEnabledItem};
+use obws::{requests::scene_items::Id as IdItem};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -25,6 +27,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             // let scene_name = &args[3];
             let res = client.scenes().set_current_program_scene(scene_name).await;
             println!("Set current scene: {} {}", switch_placeholder, scene_name);
+            println!("Result: {:?}", res);
+        }
+
+        Commands::SceneCollection {
+            switch_placeholder,
+            scene_collection_name,
+        } => {
+            // let scene_name = &args[3];
+            let res = client.scene_collections().set_current(scene_collection_name).await;
+            println!("Set current scene collection: {} {}", switch_placeholder, scene_collection_name);
             println!("Result: {:?}", res);
         }
 
@@ -152,7 +164,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             };
             let res = client
                 .filters()
-                .set_enabled(SetEnabled {
+                .set_enabled(SetEnabledFilter {
                     source,
                     filter,
                     enabled,
@@ -160,6 +172,45 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .await;
             println!("Result: {:?}", res);
         }
+
+        Commands::SceneItem {
+            command,
+            scene,
+            source,
+        } => {
+            println!("Scene Item: {:?} {:?} {:?}", command, scene, source);
+
+            // get item_id
+            let item_id = client
+                          .scene_items()
+                          .id(IdItem {
+                              scene,
+                              source,
+                              search_offset: Some(0)
+                          })
+                          .await?;
+
+            // use item_id in toggle
+            let enabled: bool = match command.as_str() {
+                "enable" => true,
+                "disable" => false,
+                "toggle" => !client.scene_items().enabled(scene, item_id).await?,
+                _ => {
+                    println!("Invalid scene item command: {}", command);
+                    return Ok(());
+                }
+            }; // use item_id in setenabled
+            let res = client
+                .scene_items()
+                .set_enabled(SetEnabledItem {
+                    scene,
+                    item_id,
+                    enabled,
+                })
+                .await;
+            println!("Result: {:?}", res);
+        }
+
     }
 
     Ok(())

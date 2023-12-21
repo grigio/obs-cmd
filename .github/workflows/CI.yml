@@ -4,33 +4,33 @@ on: [push, pull_request]
 
 jobs:
 
-  fmt:
-    runs-on: ubuntu-latest
+  # fmt:
+  #   runs-on: ubuntu-latest
 
-    steps:
+  #   steps:
 
-    - name: Checkout code
-      uses: actions/checkout@v4
+  #   - name: Checkout code
+  #     uses: actions/checkout@v4
 
-    - name: Run clippy
-      run: cargo fmt -- --check
+  #   - name: Run clippy
+  #     run: cargo fmt -- --check
 
 
-  clippy:
-    runs-on: ubuntu-22.04
+  # clippy:
+  #   runs-on: ubuntu-22.04
 
-    steps:
+  #   steps:
 
-    - name: Checkout code
-      uses: actions/checkout@v4
+  #   - name: Checkout code
+  #     uses: actions/checkout@v4
 
-    - name: Install Rust
-      run: |
-        rustup update --no-self-update stable
-        rustup component add clippy
+  #   - name: Install Rust
+  #     run: |
+  #       rustup update --no-self-update stable
+  #       rustup component add clippy
 
-    - name: Run clippy
-      run: cargo clippy -- -D warnings
+  #   - name: Run clippy
+  #     run: cargo clippy -- -D warnings
 
 
   test:

@@ -3,8 +3,8 @@ use command::*;
 
 use clap::Parser;
 use obws::{requests::filters::SetEnabled as SetEnabledFilter, Client};
-use obws::{requests::scene_items::SetEnabled as SetEnabledItem};
-use obws::{requests::scene_items::Id as IdItem};
+use obws::requests::scene_items::SetEnabled as SetEnabledItem;
+use obws::requests::scene_items::Id as IdItem;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

@@ -65,6 +65,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     println!("Recording toggled");
                     println!("Result: {:?}", res);
                 }
+                Status => {
+                    let status = client.recording().status().await?;
+                    println!("Recording: {:?}", status.active);
+                    if status.active {
+                        println!("Paused: {:?}", status.paused);
+                        println!("Timecode: {:?}", status.timecode);
+                        println!("Bytes: {:?}", status.bytes);
+                    }
+                }
             }
         }
 

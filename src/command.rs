@@ -79,6 +79,7 @@ pub enum Recording {
     Start,
     Stop,
     Toggle,
+    Status,
 }
 
 #[derive(Parser)]

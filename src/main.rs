@@ -152,6 +152,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         if res { "running" } else { "not running" }
                     );
                 }
+                LastReplay => {
+                    let res = client.replay_buffer().last_replay().await?;
+                    if res.is_empty() {
+                        println!("No last replay found");
+                    } else {
+                        println!("Replay path: {}", res);
+                    }
+                }
             }
         }
 

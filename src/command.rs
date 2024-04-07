@@ -58,6 +58,7 @@ pub enum Replay {
     Stop,
     Toggle,
     Save,
+    Status,
 }
 
 #[derive(Subcommand, Clone, Debug)]

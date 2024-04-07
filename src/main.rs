@@ -145,6 +145,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     println!("Buffer saved");
                     println!("Result: {:?}", res);
                 }
+                Status => {
+                    let res = client.replay_buffer().status().await?;
+                    println!(
+                        "Replay Buffer is {}",
+                        if res { "running" } else { "not running" }
+                    );
+                }
             }
         }
 

@@ -5,6 +5,7 @@ use clap::Parser;
 use obws::{requests::filters::SetEnabled as SetEnabledFilter, Client};
 use obws::requests::scene_items::SetEnabled as SetEnabledItem;
 use obws::requests::scene_items::Id as IdItem;
+use obws::requests::sources::SaveScreenshot;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -75,6 +76,26 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                 }
             }
+        }
+
+        Commands::SaveScreenshot {
+            source,
+            format,
+            width,
+            height,
+            compression_quality,
+            file_path,
+        } => {
+            let settings = SaveScreenshot {
+                source,
+                format,
+                width: *width,
+                height: *height,
+                compression_quality: *compression_quality,
+                file_path,
+            };
+            client.sources().save_screenshot(settings).await?;
+            println!("Saved screenshot to path: {:?}", file_path);
         }
 
         Commands::Streaming(action) => {

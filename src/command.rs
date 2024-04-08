@@ -1,4 +1,5 @@
 use clap::{Parser, Subcommand};
+use std::path::PathBuf;
 use std::str::FromStr;
 use url::Url;
 
@@ -118,6 +119,18 @@ pub enum Commands {
 
     #[clap(subcommand)]
     Recording(Recording),
+
+    SaveScreenshot {
+        source: String,
+        format: String,
+        file_path: PathBuf,
+        #[clap(long)]
+        width: Option<u32>,
+        #[clap(long)]
+        height: Option<u32>,
+        #[clap(long)]
+        compression_quality: Option<i32>,
+    },
 
     ToggleMute {
         device: String,

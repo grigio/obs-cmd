@@ -19,8 +19,11 @@ obs-cmd recording toggle
 obs-cmd recording status
 obs-cmd streaming start
 obs-cmd virtualcam start
+obs-cmd save-screenshot <source> <format> <file_path> [--width WIDTH] [--height HEIGHT] [--compression-quality COMPRESSION_QUALITY]
 obs-cmd replay toggle
 obs-cmd replay save
+obs-cmd replay status
+obs-cmd replay last-replay
 obs-cmd info
 obs-cmd --websocket obsws://localhost:4455/secret info # You can override the default `obsws` url
 ```
@@ -100,6 +103,9 @@ $ obs-cmd recording stop
 
 $ obs-cmd info
 Version: Version { obs_version: Version { major: 29, minor: 1, patch: 1 }, obs_web_socket_version: Version { major: 5, minor: 2, patch: 2 }, rpc_version: 1, available_requests: ..
+
+$ obs-cmd save-screenshot "OBS Source" "jpg" "/home/user/screenshot/test.jpg" --width 1920 --height 1080 --compression-quality 100
+Saved screenshot to path: "/home/user/screenshot/test.jpg"
 ```
 
 ## Donations

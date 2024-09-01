@@ -1,16 +1,16 @@
 [package]
 name = "obs-cmd"
-version = "0.1.1"
+version = "0.17.7"
 edition = "2021"
 description = "A minimal command to control obs via obs-websocket"
 authors = ["Luigi Maselli <luigi@grigio.org>"]
-rust-version = "1.70.0"
+rust-version = "1.78.0"
 
 [[bin]]
 name = "obs-cmd"
 
 [dependencies]
-tokio = { version = "1.28.1", features = ["rt-multi-thread", "macros"] }
+tokio = { version = "1.37.0", features = ["rt-multi-thread", "macros"] }
 obws = "0.11.5"
 clap = { version = "4.4.8", features = ["derive"] }
 url = "2.4.1"

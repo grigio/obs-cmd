@@ -43,7 +43,7 @@ jobs:
 
     
   embedded:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
     - name: Check out code
       uses: actions/checkout@v4
@@ -51,13 +51,13 @@ jobs:
     - name: Install cross
       run: cargo install cross
 
-    - name: Build for armv7-gnueabihf
-      run: cross build --target armv7-unknown-linux-gnueabihf --release
+    - name: Build for aarch64-unknown-linux-gnu
+      run: cross build --target aarch64-unknown-linux-gnu --release
 
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@2.9.0
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: target/armv7-unknown-linux-gnueabihf/release/obs-cmd
-        asset_name: obs-cmd-armv7
+        file: target/aarch64-unknown-linux-gnu/release/obs-cmd
+        asset_name: obs-cmd-aarch64-linux
         tag: ${{ github.ref }}

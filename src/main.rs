@@ -113,6 +113,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     println!("Streaming stopped");
                     println!("Result: {:?}", res);
                 }
+                Status => {
+                    let res = client.streaming().status().await?;
+                    println!("Streaming: {:?}", res.active);
+                }
                 Toggle => {
                     let res = client.streaming().toggle().await?;
                     println!("Streaming toggled");

@@ -74,6 +74,7 @@ pub enum VirtualCamera {
 pub enum Streaming {
     Start,
     Stop,
+    Status,
     Toggle,
 }
 

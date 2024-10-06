@@ -16,6 +16,7 @@ obs-cmd scene-collection switch <collection>
 obs-cmd scene-item toggle <scene> <item>
 obs-cmd toggle-mute Mic/Aux
 obs-cmd recording toggle
+obs-cmd recording toggle-pause
 obs-cmd recording status
 obs-cmd streaming start
 obs-cmd virtualcam start
@@ -30,7 +31,7 @@ obs-cmd --websocket obsws://localhost:4455/secret info # You can override the de
 
 You can override the websocket URL, which can be found in OBS -> Tools -> WebSocket Server Settings. `localhost` for the hostname will work for most, instead of the full IP address. If you set the password as `secret` you can avoid to specify the `--websocket` argument.
 
-### Installation 
+### Installation
 
 
 ### Using the provided Binaries
@@ -64,7 +65,7 @@ sudo cp target/release/obs-cmd /usr/local/bin/obs-cmd
 ```
 
 ### Installing on Arch Linux
-The `obs-cmd` package is maintained on the [Arch User Repository](https://aur.archlinux.org/packages/obs-cmd). 
+The `obs-cmd` package is maintained on the [Arch User Repository](https://aur.archlinux.org/packages/obs-cmd).
 
 Ensure that [rust](https://archlinux.org/packages/extra/x86_64/rust/) is installed for access to `cargo`.
 
@@ -96,10 +97,10 @@ sudo pacman -U obs-cmd-0.15.3-1-x86_64.pkg.tar.zst
 
 ### Example Usage
 ```
-$ obs-cmd recording start 
+$ obs-cmd recording start
 Recording started
 Result: Ok(())
-$ obs-cmd recording stop 
+$ obs-cmd recording stop
 
 $ obs-cmd info
 Version: Version { obs_version: Version { major: 29, minor: 1, patch: 1 }, obs_web_socket_version: Version { major: 5, minor: 2, patch: 2 }, rpc_version: 1, available_requests: ..

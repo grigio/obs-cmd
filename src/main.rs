@@ -75,6 +75,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         println!("Bytes: {:?}", status.bytes);
                     }
                 }
+                Pause => {
+                    let res = client.recording().pause().await;
+                    println!("Recording paused");
+                    println!("Result: {:?}", res);
+                }
+                Resume => {
+                    let res = client.recording().resume().await;
+                    println!("Recording resumed");
+                    println!("Result: {:?}", res);
+                }
                 TogglePause => {
                     let res = client.recording().toggle_pause().await;
                     println!("Recording pause toggled");

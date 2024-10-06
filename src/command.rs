@@ -84,6 +84,8 @@ pub enum Recording {
     Stop,
     Toggle,
     Status,
+    Pause,
+    Resume,
     TogglePause,
 }
 

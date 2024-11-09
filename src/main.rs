@@ -26,7 +26,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             match action {
                 Current => {
-                    let scene_name = client.scenes().current_program_scene().await.and_then(|r| Ok(r)).unwrap_or("Unknown".to_string());
+                    let scene_name = client.scenes().current_program_scene().await.and_then(|r| Ok(r))?;
                     println!("{}", scene_name);
                 },
                 Switch{scene_name} => {

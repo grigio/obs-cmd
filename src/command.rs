@@ -89,6 +89,14 @@ pub enum Recording {
     TogglePause,
 }
 
+#[derive(Subcommand, Clone, Debug)]
+pub enum Scene {
+    Current,
+    Switch{
+        scene_name: String,
+    }
+}
+
 #[derive(Parser)]
 #[clap(author, version, about, long_about = None)]
 pub struct Cli {
@@ -103,10 +111,8 @@ pub struct Cli {
 #[derive(Subcommand)]
 pub enum Commands {
     Info,
-    Scene {
-        switch_placeholder: String, // NOTE: just for args positioning
-        scene_name: String,
-    },
+    #[clap(subcommand)]
+    Scene (Scene),
     SceneCollection {
         switch_placeholder: String, // NOTE: just for args positioning
         scene_collection_name: String,

@@ -21,14 +21,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
 
     match &cli.command {
-        Commands::Scene {
-            switch_placeholder,
-            scene_name,
-        } => {
-            // let scene_name = &args[3];
-            let res = client.scenes().set_current_program_scene(scene_name).await;
-            println!("Set current scene: {} {}", switch_placeholder, scene_name);
-            println!("Result: {:?}", res);
+        Commands::Scene(action) => {
+            use Scene::*;
+
+            match action {
+                Current => {
+                    let scene_name = client.scenes().current_program_scene().await.and_then(|r| Ok(r)).unwrap_or("Unknown".to_string());
+                    println!("{}", scene_name);
+                },
+                Switch{scene_name} => {
+                    let res = client.scenes().set_current_program_scene(scene_name).await;
+                    println!("Set current scene: switch {}", scene_name);
+                    println!("Result: {:?}", res);
+                },
+            }
         }
 
         Commands::SceneCollection {

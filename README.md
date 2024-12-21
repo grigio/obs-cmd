@@ -31,6 +31,7 @@ obs-cmd replay status
 obs-cmd replay last-replay
 obs-cmd info
 obs-cmd --websocket obsws://localhost:4455/secret info # You can override the default `obsws` url
+OBS_WEBSOCKET_URL=obsws://localhost:4455/secret obs-cmd info
 ```
 
 You can override the websocket URL, which can be found in OBS -> Tools -> WebSocket Server Settings. `localhost` for the hostname will work for most, instead of the full IP address. If you set the password as `secret` you can avoid to specify the `--websocket` argument.

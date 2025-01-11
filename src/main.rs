@@ -3,9 +3,9 @@ use command::*;
 
 use clap::Parser;
 use obws::{requests::filters::SetEnabled as SetEnabledFilter, Client};
-use obws::requests::scene_items::SetEnabled as SetEnabledItem;
-use obws::requests::scene_items::Id as IdItem;
-use obws::requests::sources::SaveScreenshot;
+use obws::{requests::scene_items::SetEnabled as SetEnabledItem};
+use obws::{requests::scene_items::Id as IdItem};
+use obws::{requests::sources::SaveScreenshot};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -38,24 +38,30 @@ let client = match std::env::var("OBS_WEBSOCKET_URL") {
             match action {
                 Current => {
                     let scene_name = client.scenes().current_program_scene().await.and_then(|r| Ok(r))?;
-                    println!("{}", scene_name);
+                    println!("{:?}", scene_name);
                 },
                 Switch{scene_name} => {
                     let res = client.scenes().set_current_program_scene(scene_name).await;
-                    println!("Set current scene: switch {}", scene_name);
+                    println!("Set current scene: switch {:?}", scene_name);
                     println!("Result: {:?}", res);
                 },
             }
         }
 
-        Commands::SceneCollection {
-            switch_placeholder,
-            scene_collection_name,
-        } => {
-            // let scene_name = &args[3];
-            let res = client.scene_collections().set_current(scene_collection_name).await;
-            println!("Set current scene collection: {} {}", switch_placeholder, scene_collection_name);
-            println!("Result: {:?}", res);
+        Commands::SceneCollection(action) => {
+            use SceneCollection::*;
+
+            match action {
+                Current => {
+                    let scene_collection_name = client.scene_collections().current().await.and_then(|r| Ok(r))?;
+                    println!("{:?}", scene_collection_name);
+                },
+                Switch{scene_collection_name} => {
+                    let res = client.scene_collections().set_current(scene_collection_name).await;
+                    println!("Set current scene collection: {:?}", scene_collection_name);
+                    println!("Result: {:?}", res);
+                },
+            }
         }
 
         Commands::Info => {
@@ -118,6 +124,7 @@ let client = match std::env::var("OBS_WEBSOCKET_URL") {
             compression_quality,
             file_path,
         } => {
+
             let settings = SaveScreenshot {
                 source,
                 format,
@@ -214,7 +221,7 @@ let client = match std::env::var("OBS_WEBSOCKET_URL") {
                     if res.is_empty() {
                         println!("No last replay found");
                     } else {
-                        println!("Replay path: {}", res);
+                        println!("Replay path: {:?}", res);
                     }
                 }
             }
@@ -239,7 +246,7 @@ let client = match std::env::var("OBS_WEBSOCKET_URL") {
                 "disable" => false,
                 "toggle" => !client.filters().get(source, filter).await?.enabled,
                 _ => {
-                    println!("Invalid filter command: {}", command);
+                    println!("Invalid filter command: {:?}", command);
                     return Ok(());
                 }
             };
@@ -277,7 +284,7 @@ let client = match std::env::var("OBS_WEBSOCKET_URL") {
                 "disable" => false,
                 "toggle" => !client.scene_items().enabled(scene, item_id).await?,
                 _ => {
-                    println!("Invalid scene item command: {}", command);
+                    println!("Invalid scene item command: {:?}", command);
                     return Ok(());
                 }
             }; // use item_id in setenabled
@@ -289,6 +296,15 @@ let client = match std::env::var("OBS_WEBSOCKET_URL") {
                     enabled,
                 })
                 .await;
+            println!("Result: {:?}", res);
+        }
+
+        Commands::TriggerHotkey {
+            name
+        } => {
+            println!("Trigger Hotkey: {:?}", name);
+
+            let res = client.hotkeys().trigger_by_name(name).await;
             println!("Result: {:?}", res);
         }
 

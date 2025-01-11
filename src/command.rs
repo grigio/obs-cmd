@@ -158,4 +158,8 @@ pub enum Commands {
         source: String,
     }
 
+    TriggerHotkey {
+        name: String,
+    }
+
 }

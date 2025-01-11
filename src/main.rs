@@ -227,10 +227,27 @@ let client = match std::env::var("OBS_WEBSOCKET_URL") {
             }
         }
 
-        Commands::ToggleMute { device } => {
-            println!("Toggling mute on device: {:?}  ", device);
+        Commands::Audio {
+            command,
+            device
+        } => {
+            println!("Audio: {:?} {:?}", command, device);
 
-            let res = client.inputs().toggle_mute(device).await;
+            let muted: bool = match command.as_str() {
+                "mute" => true,
+                "unmute" => false,
+                "toggle" => !client.inputs().muted(device).await?,
+                "status" => {
+                    let status = client.inputs().muted(device).await?;
+                    println!("Muted: {:?}", status);
+                    return Ok(());
+                }
+                _ => {
+                    println!("Invalid audio command: {:?}", command);
+                    return Ok(());
+                }
+            };
+            let res = client.inputs().set_muted(device, muted).await;
             println!("Result: {:?}", res);
         }
 

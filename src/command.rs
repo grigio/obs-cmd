@@ -97,6 +97,14 @@ pub enum Scene {
     }
 }
 
+#[derive(Subcommand, Clone, Debug)]
+pub enum SceneCollection {
+    Current,
+    Switch{
+        scene_collection_name: String,
+    }
+}
+
 #[derive(Parser)]
 #[clap(author, version, about, long_about = None)]
 pub struct Cli {
@@ -113,10 +121,9 @@ pub enum Commands {
     Info,
     #[clap(subcommand)]
     Scene (Scene),
-    SceneCollection {
-        switch_placeholder: String, // NOTE: just for args positioning
-        scene_collection_name: String,
-    },
+
+    #[clap(subcommand)]
+    SceneCollection (SceneCollection),
 
     #[clap(subcommand)]
     Replay(Replay),
@@ -156,7 +163,7 @@ pub enum Commands {
         command: String,
         scene: String,
         source: String,
-    }
+    },
 
     TriggerHotkey {
         name: String,

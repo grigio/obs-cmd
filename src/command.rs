@@ -149,7 +149,8 @@ pub enum Commands {
         compression_quality: Option<i32>,
     },
 
-    ToggleMute {
+    Audio {
+        command: String,
         device: String,
     },
 

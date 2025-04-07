@@ -37,13 +37,14 @@ let client = match std::env::var("OBS_WEBSOCKET_URL") {
 
             match action {
                 Current => {
-                    let scene_name = client.scenes().current_program_scene().await.and_then(|r| Ok(r))?;
+                    let scene_name = client.scenes().current_program_scene().await?;
                     println!("{:?}", scene_name);
                 },
                 Switch{scene_name} => {
                     let res = client.scenes().set_current_program_scene(scene_name).await;
                     println!("Set current scene: switch {:?}", scene_name);
                     println!("Result: {:?}", res);
+                    res?;
                 },
             }
         }
@@ -53,13 +54,14 @@ let client = match std::env::var("OBS_WEBSOCKET_URL") {
 
             match action {
                 Current => {
-                    let scene_collection_name = client.scene_collections().current().await.and_then(|r| Ok(r))?;
+                    let scene_collection_name = client.scene_collections().current().await?;
                     println!("{:?}", scene_collection_name);
                 },
                 Switch{scene_collection_name} => {
                     let res = client.scene_collections().set_current(scene_collection_name).await;
                     println!("Set current scene collection: {:?}", scene_collection_name);
                     println!("Result: {:?}", res);
+                    res?;
                 },
             }
         }
@@ -76,18 +78,21 @@ let client = match std::env::var("OBS_WEBSOCKET_URL") {
             match action {
                 Start => {
                     let res = client.recording().start().await;
-                    println!("Recording started");
+                    println!("Start recording");
                     println!("Result: {:?}", res);
+                    res?;
                 }
                 Stop => {
                     let res = client.recording().stop().await;
-                    println!("Recording stopped");
+                    println!("Stop recording");
                     println!("Result: {:?}", res);
+                    res?;
                 }
                 Toggle => {
                     let res = client.recording().toggle().await;
-                    println!("Recording toggled");
+                    println!("Toggle recording");
                     println!("Result: {:?}", res);
+                    res?;
                 }
                 Status => {
                     let status = client.recording().status().await?;
@@ -100,18 +105,21 @@ let client = match std::env::var("OBS_WEBSOCKET_URL") {
                 }
                 Pause => {
                     let res = client.recording().pause().await;
-                    println!("Recording paused");
+                    println!("Pause recording");
                     println!("Result: {:?}", res);
+                    res?;
                 }
                 Resume => {
                     let res = client.recording().resume().await;
-                    println!("Recording resumed");
+                    println!("Resume recording");
                     println!("Result: {:?}", res);
+                    res?;
                 }
                 TogglePause => {
                     let res = client.recording().toggle_pause().await;
-                    println!("Recording pause toggled");
+                    println!("Toggle recording pause");
                     println!("Result: {:?}", res);
+                    res?;
                 }
             }
         }
@@ -144,21 +152,23 @@ let client = match std::env::var("OBS_WEBSOCKET_URL") {
             match action {
                 Start => {
                     let res = client.streaming().start().await;
-                    println!("Streaming started");
+                    println!("Start streaming");
                     println!("Result: {:?}", res);
+                    res?;
                 }
                 Stop => {
                     let res = client.streaming().stop().await;
-                    println!("Streaming stopped");
+                    println!("Stop streaming");
                     println!("Result: {:?}", res);
+                    res?;
                 }
                 Status => {
                     let res = client.streaming().status().await?;
-                    println!("Streaming: {:?}", res.active);
+                    println!("Streaming status: {:?}", res.active);
                 }
                 Toggle => {
                     let res = client.streaming().toggle().await?;
-                    println!("Streaming toggled");
+                    println!("Toggle streaming");
                     println!("Result: {:?}", res);
                 }
             }
@@ -172,10 +182,12 @@ let client = match std::env::var("OBS_WEBSOCKET_URL") {
                 Start => {
                     let res = client.virtual_cam().start().await;
                     println!("Result: {:?}", res);
+                    res?;
                 }
                 Stop => {
                     let res = client.virtual_cam().stop().await;
                     println!("Result: {:?}", res);
+                    res?;
                 }
                 Toggle => {
                     let res = client.virtual_cam().toggle().await?;
@@ -191,23 +203,26 @@ let client = match std::env::var("OBS_WEBSOCKET_URL") {
             match action {
                 Start => {
                     let res = client.replay_buffer().start().await;
-                    println!("Replay Buffer started");
+                    println!("Start Replay Buffer");
                     println!("Result: {:?}", res);
+                    res?;
                 }
                 Stop => {
                     let res = client.replay_buffer().stop().await;
-                    println!("Replay Buffer stopped");
+                    println!("Stop Replay Buffer");
                     println!("Result: {:?}", res);
+                    res?;
                 }
                 Toggle => {
                     let res = client.replay_buffer().toggle().await?;
-                    println!("Replay Buffer toggled");
+                    println!("Toggle Replay Buffer");
                     println!("Result: {:?}", res);
                 }
                 Save => {
+                    println!("Save buffer");
                     let res = client.replay_buffer().save().await;
-                    println!("Buffer saved");
                     println!("Result: {:?}", res);
+                    res?;
                 }
                 Status => {
                     let res = client.replay_buffer().status().await?;
@@ -219,10 +234,11 @@ let client = match std::env::var("OBS_WEBSOCKET_URL") {
                 LastReplay => {
                     let res = client.replay_buffer().last_replay().await?;
                     if res.is_empty() {
-                        println!("No last replay found");
-                    } else {
-                        println!("Replay path: {:?}", res);
-                    }
+                        let error_message = "No last replay found";
+                        println!("{error_message}");
+                        Err(error_message)?;
+                    } 
+                    println!("Replay path: {:?}", res);
                 }
             }
         }
@@ -243,12 +259,14 @@ let client = match std::env::var("OBS_WEBSOCKET_URL") {
                     return Ok(());
                 }
                 _ => {
-                    println!("Invalid audio command: {:?}", command);
-                    return Ok(());
+                    let error_message = format!("Invalid audio command: {:?}", command);
+                    println!("{error_message}");
+                    return Err(error_message)?;
                 }
             };
             let res = client.inputs().set_muted(device, muted).await;
             println!("Result: {:?}", res);
+            res?;
         }
 
         Commands::Filter {
@@ -263,8 +281,9 @@ let client = match std::env::var("OBS_WEBSOCKET_URL") {
                 "disable" => false,
                 "toggle" => !client.filters().get(source, filter).await?.enabled,
                 _ => {
-                    println!("Invalid filter command: {:?}", command);
-                    return Ok(());
+                    let error_message = format!("Invalid filter command: {:?}", command);
+                    println!("{error_message}");
+                    return Err(error_message)?;
                 }
             };
             let res = client
@@ -276,6 +295,7 @@ let client = match std::env::var("OBS_WEBSOCKET_URL") {
                 })
                 .await;
             println!("Result: {:?}", res);
+            res?;
         }
 
         Commands::SceneItem {
@@ -301,8 +321,9 @@ let client = match std::env::var("OBS_WEBSOCKET_URL") {
                 "disable" => false,
                 "toggle" => !client.scene_items().enabled(scene, item_id).await?,
                 _ => {
-                    println!("Invalid scene item command: {:?}", command);
-                    return Ok(());
+                    let error_message = format!("Invalid scene item command: {:?}", command);
+                    println!("{error_message}");
+                    return Err(error_message)?;
                 }
             }; // use item_id in setenabled
             let res = client
@@ -314,15 +335,16 @@ let client = match std::env::var("OBS_WEBSOCKET_URL") {
                 })
                 .await;
             println!("Result: {:?}", res);
+            res?;
         }
 
         Commands::TriggerHotkey {
             name
         } => {
             println!("Trigger Hotkey: {:?}", name);
-
             let res = client.hotkeys().trigger_by_name(name).await;
             println!("Result: {:?}", res);
+            res?;
         }
 
     }

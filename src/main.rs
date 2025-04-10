@@ -103,6 +103,20 @@ let client = match std::env::var("OBS_WEBSOCKET_URL") {
                         println!("Bytes: {:?}", status.bytes);
                     }
                 }
+                StatusActive => {
+                    let status = client.recording().status().await?;
+                    if status.active && !status.paused {
+                        println!("Active (started and running)");
+                    } else if !status.active {
+                        let error_message = "Inactive (not started)";
+                        println!("{error_message}");
+                        Err(error_message)?;
+                    } else {
+                        let error_message = "Inactive (not running)";
+                        println!("{error_message}");
+                        Err(error_message)?;
+                    }
+                }
                 Pause => {
                     let res = client.recording().pause().await;
                     println!("Pause recording");
@@ -345,6 +359,29 @@ let client = match std::env::var("OBS_WEBSOCKET_URL") {
             let res = client.hotkeys().trigger_by_name(name).await;
             println!("Result: {:?}", res);
             res?;
+        }
+
+        Commands::FullscreenProjector {
+        } => {
+            use obws::{requests::ui::OpenVideoMixProjector};
+            use obws::{requests::ui::VideoMixType::Program as OpenVideoMixProjectorType};
+            use obws::{requests::ui::Location::MonitorIndex as MonitorLocationIndex};
+            println!("Open fullscreen projector");
+            let monitor_list_res = client.ui().list_monitors().await;
+            if monitor_list_res.is_ok() {
+                let monitor_list = monitor_list_res.unwrap();
+                if monitor_list.len() > 0 {
+                    let res = client.ui().open_video_mix_projector(OpenVideoMixProjector{ r#type: OpenVideoMixProjectorType, location:
+                        Some(MonitorLocationIndex(monitor_list[0].index as i32))
+                    }).await;
+                    println!("Result: {:?}", res);
+                    res?;
+                } else {
+                    Err("No monitor in list")?;
+                }
+            } else {
+                Err("No monitor list received")?;
+            }
         }
 
     }

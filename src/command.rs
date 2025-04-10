@@ -84,6 +84,7 @@ pub enum Recording {
     Stop,
     Toggle,
     Status,
+    StatusActive,
     Pause,
     Resume,
     TogglePause,
@@ -168,6 +169,9 @@ pub enum Commands {
 
     TriggerHotkey {
         name: String,
+    },
+
+    FullscreenProjector {
     }
 
 }

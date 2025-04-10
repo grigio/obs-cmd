@@ -22,6 +22,7 @@ obs-cmd recording pause
 obs-cmd recording resume
 obs-cmd recording toggle-pause
 obs-cmd recording status
+obs-cmd recording status-active
 obs-cmd streaming start
 obs-cmd virtualcam start
 obs-cmd save-screenshot <source> <format> <file_path> [--width WIDTH] [--height HEIGHT] [--compression-quality COMPRESSION_QUALITY]
@@ -29,6 +30,8 @@ obs-cmd replay toggle
 obs-cmd replay save
 obs-cmd replay status
 obs-cmd replay last-replay
+obs-cmd trigger-hotkey
+obs-cmd fullscreen-projector
 obs-cmd info
 obs-cmd --websocket obsws://localhost:4455/secret info # You can override the default `obsws` url
 OBS_WEBSOCKET_URL=obsws://localhost:4455/secret obs-cmd info

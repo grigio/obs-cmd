@@ -172,6 +172,14 @@ pub enum Commands {
     },
 
     FullscreenProjector {
+        #[arg(long, default_value_t = 0)]
+        monitor_index: u8,
+    },
+
+    SourceProjector {
+        name: String,
+        #[arg(long, default_value_t = 0)]
+        monitor_index: u8,
     }
 
 }

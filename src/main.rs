@@ -362,6 +362,7 @@ let client = match std::env::var("OBS_WEBSOCKET_URL") {
         }
 
         Commands::FullscreenProjector {
+            monitor_index
         } => {
             use obws::{requests::ui::OpenVideoMixProjector};
             use obws::{requests::ui::VideoMixType::Program as OpenVideoMixProjectorType};
@@ -370,14 +371,38 @@ let client = match std::env::var("OBS_WEBSOCKET_URL") {
             let monitor_list_res = client.ui().list_monitors().await;
             if monitor_list_res.is_ok() {
                 let monitor_list = monitor_list_res.unwrap();
-                if monitor_list.len() > 0 {
+                if monitor_list.len() > (*monitor_index as usize) {
                     let res = client.ui().open_video_mix_projector(OpenVideoMixProjector{ r#type: OpenVideoMixProjectorType, location:
-                        Some(MonitorLocationIndex(monitor_list[0].index as i32))
+                        Some(MonitorLocationIndex(*monitor_index as i32))
                     }).await;
                     println!("Result: {:?}", res);
                     res?;
                 } else {
-                    Err("No monitor in list")?;
+                    Err("Monitor not in list")?;
+                }
+            } else {
+                Err("No monitor list received")?;
+            }
+        }
+
+        Commands::SourceProjector {
+            name,
+            monitor_index
+        } => {
+            use obws::{requests::ui::OpenSourceProjector};
+            use obws::{requests::ui::Location::MonitorIndex as MonitorLocationIndex};
+            println!("Open source projector");
+            let monitor_list_res = client.ui().list_monitors().await;
+            if monitor_list_res.is_ok() {
+                let monitor_list = monitor_list_res.unwrap();
+                if monitor_list.len() > (*monitor_index as usize) {
+                    let res = client.ui().open_source_projector(OpenSourceProjector{ source: name, location:
+                        Some(MonitorLocationIndex(*monitor_index as i32))
+                    }).await;
+                    println!("Result: {:?}", res);
+                    res?;
+                } else {
+                    Err("Monitor not in list")?;
                 }
             } else {
                 Err("No monitor list received")?;

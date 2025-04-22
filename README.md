@@ -31,7 +31,8 @@ obs-cmd replay save
 obs-cmd replay status
 obs-cmd replay last-replay
 obs-cmd trigger-hotkey
-obs-cmd fullscreen-projector
+obs-cmd fullscreen-projector [--monitor-index INDEX]
+obs-cmd source-projector <source-name> [--monitor-index INDEX]
 obs-cmd info
 obs-cmd --websocket obsws://localhost:4455/secret info # You can override the default `obsws` url
 OBS_WEBSOCKET_URL=obsws://localhost:4455/secret obs-cmd info

@@ -93,17 +93,13 @@ pub enum Recording {
 #[derive(Subcommand, Clone, Debug)]
 pub enum Scene {
     Current,
-    Switch{
-        scene_name: String,
-    }
+    Switch { scene_name: String },
 }
 
 #[derive(Subcommand, Clone, Debug)]
 pub enum SceneCollection {
     Current,
-    Switch{
-        scene_collection_name: String,
-    }
+    Switch { scene_collection_name: String },
 }
 
 #[derive(Parser)]
@@ -121,10 +117,10 @@ pub struct Cli {
 pub enum Commands {
     Info,
     #[clap(subcommand)]
-    Scene (Scene),
+    Scene(Scene),
 
     #[clap(subcommand)]
-    SceneCollection (SceneCollection),
+    SceneCollection(SceneCollection),
 
     #[clap(subcommand)]
     Replay(Replay),
@@ -180,6 +176,73 @@ pub enum Commands {
         name: String,
         #[arg(long, default_value_t = 0)]
         monitor_index: u8,
-    }
+    },
+    #[clap(subcommand)]
+    MediaInput(MediaInput),
+}
 
+#[derive(Subcommand, Clone, Debug)]
+pub enum MediaInput {
+    /// Sets the cursor of the media input
+    SetCursor {
+        /// The name of media input
+        name: String,
+        /// The duration in human readable format for example:
+        #[arg(value_parser=parse_duration)]
+        cursor: time::Duration,
+    },
+}
+
+// Parses strings of such format:
+// 0:00 -> 0 seconds
+// 01:00 -> 1 minute
+// 1:00:00 -> 1 hour
+fn parse_duration(s: &str) -> Result<time::Duration, String> {
+    let parts = s.split_terminator(':').collect::<Vec<_>>();
+    // "00:00" -> parts => ["00", "00"]
+    // "1:00:00" -> parts => ["1", "00", "00"]
+    match parts.as_slice() {
+        [] | [_] => return Err("Duration should be of format [hh:]mm:ss".into()),
+        [m, s] => {
+            let m = i64::from_str(m).map_err(|e| format!("Failed to parse minutes: {e}"))?;
+            let s = i64::from_str(s).map_err(|e| format!("Failed to parse seconds: {e}"))?;
+            return Ok(time::Duration::seconds(m * 60 + s));
+        }
+        [h, m, s] => {
+            let h = i64::from_str(h).map_err(|e| format!("Failed to parse hours: {e}"))?;
+            let m = i64::from_str(m).map_err(|e| format!("Failed to parse minutes: {e}"))?;
+            let s = i64::from_str(s).map_err(|e| format!("Failed to parse seconds: {e}"))?;
+            return Ok(time::Duration::seconds(h * 60 * 60 + m * 60 + s));
+        }
+        _ => return Err("Duration should be of format [hh:]mm:ss".into()),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::command::parse_duration;
+
+    #[test]
+    fn test_parse_duration() {
+        assert_eq!(
+            parse_duration("0:00").unwrap(),
+            time::Duration::milliseconds(0)
+        );
+        assert_eq!(
+            parse_duration("00:00").unwrap(),
+            time::Duration::milliseconds(0)
+        );
+        assert_eq!(
+            parse_duration("0:1").unwrap(),
+            time::Duration::milliseconds(1000)
+        );
+        assert_eq!(
+            parse_duration("10:12").unwrap(),
+            time::Duration::seconds(10 * 60 + 12)
+        );
+        assert_eq!(
+            parse_duration("1:10:12").unwrap(),
+            time::Duration::seconds(60 * 60 + 10 * 60 + 12)
+        );
+    }
 }

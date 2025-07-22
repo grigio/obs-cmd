@@ -219,8 +219,9 @@ pub enum MediaInput {
 // 1:00:00 -> 1 hour
 fn parse_duration(s: &str) -> Result<time::Duration, String> {
     let parts = s.split_terminator(':').collect::<Vec<_>>();
-    // "00:00" -> parts => ["00", "00"]
-    // "1:00:00" -> parts => ["1", "00", "00"]
+    // "00:00" -> parts = ["00", "00"]
+    // "1:00:00" -> parts = ["1", "00", "00"]
+
     match parts.as_slice() {
         [m, s] => {
             let m = i64::from_str(m).map_err(|e| format!("Failed to parse minutes: {e}"))?;

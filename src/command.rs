@@ -188,6 +188,9 @@ pub enum MediaInput {
         /// The name of media input
         name: String,
         /// The duration in human readable format for example:
+        /// - "00:15" (means 15 seconds)
+        /// - "23:15" (means 23 minutes and 15 seconds)
+        /// - "1:00:15" (means 1 hour and 15 seconds)
         #[arg(value_parser=parse_duration)]
         cursor: time::Duration,
     },

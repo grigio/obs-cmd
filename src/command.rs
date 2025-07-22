@@ -222,7 +222,6 @@ fn parse_duration(s: &str) -> Result<time::Duration, String> {
     // "00:00" -> parts => ["00", "00"]
     // "1:00:00" -> parts => ["1", "00", "00"]
     match parts.as_slice() {
-        [] | [_] => return Err("Duration should be of format [hh:]mm:ss".into()),
         [m, s] => {
             let m = i64::from_str(m).map_err(|e| format!("Failed to parse minutes: {e}"))?;
             let s = i64::from_str(s).map_err(|e| format!("Failed to parse seconds: {e}"))?;

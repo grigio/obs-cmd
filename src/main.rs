@@ -2,36 +2,50 @@ mod command;
 use command::*;
 
 use clap::Parser;
+use obws::requests::scene_items::Id as IdItem;
+use obws::requests::scene_items::SetEnabled as SetEnabledItem;
+use obws::requests::sources::SaveScreenshot;
 use obws::{requests::filters::SetEnabled as SetEnabledFilter, Client};
-use obws::{requests::scene_items::SetEnabled as SetEnabledItem};
-use obws::{requests::scene_items::Id as IdItem};
-use obws::{requests::sources::SaveScreenshot};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cli = Cli::parse();
 
-let client = match std::env::var("OBS_WEBSOCKET_URL") {
-    Ok(url) => {
-        let parsed_url = url::Url::parse(&url).expect("Invalid OBS_WEBSOCKET_URL format");
-        let hostname = parsed_url.host_str().expect("Hostname not found in OBS_WEBSOCKET_URL").to_string();
-        let port = parsed_url.port().expect("Port not found in OBS_WEBSOCKET_URL");
-        let password = parsed_url.path_segments().and_then(|mut segments| segments.next()).ok_or(url::ParseError::RelativeUrlWithoutBase)?;
+    let client = match std::env::var("OBS_WEBSOCKET_URL") {
+        Ok(url) => {
+            let parsed_url = url::Url::parse(&url).expect("Invalid OBS_WEBSOCKET_URL format");
+            let hostname = parsed_url
+                .host_str()
+                .expect("Hostname not found in OBS_WEBSOCKET_URL")
+                .to_string();
+            let port = parsed_url
+                .port()
+                .expect("Port not found in OBS_WEBSOCKET_URL");
+            let password = parsed_url
+                .path_segments()
+                .and_then(|mut segments| segments.next())
+                .ok_or(url::ParseError::RelativeUrlWithoutBase)?;
 
-        // let password = parsed_url.password().map(|p| p.to_string());
-        Client::connect(hostname, port, Some(password)).await?
-    },
-    Err(_) => match cli.websocket {
-        Some(ObsWebsocket {
-            hostname,
-            port,
-            password,
-        }) => Client::connect(hostname, port, password).await?,
-        None => Client::connect("localhost", 4455, Some("secret")).await?,
-    },
-};
+            // let password = parsed_url.password().map(|p| p.to_string());
+            Client::connect(hostname, port, Some(password)).await?
+        }
+        Err(_) => match cli.websocket {
+            Some(ObsWebsocket {
+                hostname,
+                port,
+                password,
+            }) => Client::connect(hostname, port, password).await?,
+            None => Client::connect("localhost", 4455, Some("secret")).await?,
+        },
+    };
 
     match &cli.command {
+        Commands::MediaInput(media_input) => match media_input {
+            MediaInput::SetCursor { name, cursor } => {
+                client.media_inputs().set_cursor(name, *cursor).await?;
+                println!("Media input cursor was set to: {cursor:?}")
+            }
+        },
         Commands::Scene(action) => {
             use Scene::*;
 
@@ -39,13 +53,13 @@ let client = match std::env::var("OBS_WEBSOCKET_URL") {
                 Current => {
                     let scene_name = client.scenes().current_program_scene().await?;
                     println!("{:?}", scene_name);
-                },
-                Switch{scene_name} => {
+                }
+                Switch { scene_name } => {
                     let res = client.scenes().set_current_program_scene(scene_name).await;
                     println!("Set current scene: switch {:?}", scene_name);
                     println!("Result: {:?}", res);
                     res?;
-                },
+                }
             }
         }
 
@@ -56,13 +70,18 @@ let client = match std::env::var("OBS_WEBSOCKET_URL") {
                 Current => {
                     let scene_collection_name = client.scene_collections().current().await?;
                     println!("{:?}", scene_collection_name);
-                },
-                Switch{scene_collection_name} => {
-                    let res = client.scene_collections().set_current(scene_collection_name).await;
+                }
+                Switch {
+                    scene_collection_name,
+                } => {
+                    let res = client
+                        .scene_collections()
+                        .set_current(scene_collection_name)
+                        .await;
                     println!("Set current scene collection: {:?}", scene_collection_name);
                     println!("Result: {:?}", res);
                     res?;
-                },
+                }
             }
         }
 
@@ -146,7 +165,6 @@ let client = match std::env::var("OBS_WEBSOCKET_URL") {
             compression_quality,
             file_path,
         } => {
-
             let settings = SaveScreenshot {
                 source,
                 format,
@@ -251,16 +269,13 @@ let client = match std::env::var("OBS_WEBSOCKET_URL") {
                         let error_message = "No last replay found";
                         println!("{error_message}");
                         Err(error_message)?;
-                    } 
+                    }
                     println!("Replay path: {:?}", res);
                 }
             }
         }
 
-        Commands::Audio {
-            command,
-            device
-        } => {
+        Commands::Audio { command, device } => {
             println!("Audio: {:?} {:?}", command, device);
 
             let muted: bool = match command.as_str() {
@@ -321,13 +336,13 @@ let client = match std::env::var("OBS_WEBSOCKET_URL") {
 
             // get item_id
             let item_id = client
-                          .scene_items()
-                          .id(IdItem {
-                              scene,
-                              source,
-                              search_offset: Some(0)
-                          })
-                          .await?;
+                .scene_items()
+                .id(IdItem {
+                    scene,
+                    source,
+                    search_offset: Some(0),
+                })
+                .await?;
 
             // use item_id in toggle
             let enabled: bool = match command.as_str() {
@@ -352,29 +367,29 @@ let client = match std::env::var("OBS_WEBSOCKET_URL") {
             res?;
         }
 
-        Commands::TriggerHotkey {
-            name
-        } => {
+        Commands::TriggerHotkey { name } => {
             println!("Trigger Hotkey: {:?}", name);
             let res = client.hotkeys().trigger_by_name(name).await;
             println!("Result: {:?}", res);
             res?;
         }
 
-        Commands::FullscreenProjector {
-            monitor_index
-        } => {
-            use obws::{requests::ui::OpenVideoMixProjector};
-            use obws::{requests::ui::VideoMixType::Program as OpenVideoMixProjectorType};
-            use obws::{requests::ui::Location::MonitorIndex as MonitorLocationIndex};
+        Commands::FullscreenProjector { monitor_index } => {
+            use obws::requests::ui::Location::MonitorIndex as MonitorLocationIndex;
+            use obws::requests::ui::OpenVideoMixProjector;
+            use obws::requests::ui::VideoMixType::Program as OpenVideoMixProjectorType;
             println!("Open fullscreen projector");
             let monitor_list_res = client.ui().list_monitors().await;
             if monitor_list_res.is_ok() {
                 let monitor_list = monitor_list_res.unwrap();
                 if monitor_list.len() > (*monitor_index as usize) {
-                    let res = client.ui().open_video_mix_projector(OpenVideoMixProjector{ r#type: OpenVideoMixProjectorType, location:
-                        Some(MonitorLocationIndex(*monitor_index as i32))
-                    }).await;
+                    let res = client
+                        .ui()
+                        .open_video_mix_projector(OpenVideoMixProjector {
+                            r#type: OpenVideoMixProjectorType,
+                            location: Some(MonitorLocationIndex(*monitor_index as i32)),
+                        })
+                        .await;
                     println!("Result: {:?}", res);
                     res?;
                 } else {
@@ -387,18 +402,22 @@ let client = match std::env::var("OBS_WEBSOCKET_URL") {
 
         Commands::SourceProjector {
             name,
-            monitor_index
+            monitor_index,
         } => {
-            use obws::{requests::ui::OpenSourceProjector};
-            use obws::{requests::ui::Location::MonitorIndex as MonitorLocationIndex};
+            use obws::requests::ui::Location::MonitorIndex as MonitorLocationIndex;
+            use obws::requests::ui::OpenSourceProjector;
             println!("Open source projector");
             let monitor_list_res = client.ui().list_monitors().await;
             if monitor_list_res.is_ok() {
                 let monitor_list = monitor_list_res.unwrap();
                 if monitor_list.len() > (*monitor_index as usize) {
-                    let res = client.ui().open_source_projector(OpenSourceProjector{ source: name, location:
-                        Some(MonitorLocationIndex(*monitor_index as i32))
-                    }).await;
+                    let res = client
+                        .ui()
+                        .open_source_projector(OpenSourceProjector {
+                            source: name,
+                            location: Some(MonitorLocationIndex(*monitor_index as i32)),
+                        })
+                        .await;
                     println!("Result: {:?}", res);
                     res?;
                 } else {
@@ -408,7 +427,6 @@ let client = match std::env::var("OBS_WEBSOCKET_URL") {
                 Err("No monitor list received")?;
             }
         }
-
     }
 
     Ok(())

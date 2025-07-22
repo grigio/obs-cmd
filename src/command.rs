@@ -218,23 +218,15 @@ pub enum MediaInput {
 // 01:00 -> 1 minute
 // 1:00:00 -> 1 hour
 fn parse_duration(s: &str) -> Result<time::Duration, String> {
-    let parts = s.split_terminator(':').collect::<Vec<_>>();
-    // "00:00" -> parts = ["00", "00"]
-    // "1:00:00" -> parts = ["1", "00", "00"]
+    let parts = s
+        .split_terminator(':')
+        .map(|part| i64::from_str(part))
+        .collect::<Vec<_>>();
 
     match parts.as_slice() {
-        [m, s] => {
-            let m = i64::from_str(m).map_err(|e| format!("Failed to parse minutes: {e}"))?;
-            let s = i64::from_str(s).map_err(|e| format!("Failed to parse seconds: {e}"))?;
-            return Ok(time::Duration::seconds(m * 60 + s));
-        }
-        [h, m, s] => {
-            let h = i64::from_str(h).map_err(|e| format!("Failed to parse hours: {e}"))?;
-            let m = i64::from_str(m).map_err(|e| format!("Failed to parse minutes: {e}"))?;
-            let s = i64::from_str(s).map_err(|e| format!("Failed to parse seconds: {e}"))?;
-            return Ok(time::Duration::seconds(h * 60 * 60 + m * 60 + s));
-        }
-        _ => return Err("Duration should be of format [hh:]mm:ss".into()),
+        [Ok(m), Ok(s)] => Ok(time::Duration::seconds(m * 60 + s)),
+        [Ok(h), Ok(m), Ok(s)] => Ok(time::Duration::seconds(h * 60 * 60 + m * 60 + s)),
+        _ => Err("Duration should be of format [hh:]mm:ss".into()),
     }
 }
 

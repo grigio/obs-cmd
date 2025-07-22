@@ -191,6 +191,26 @@ pub enum MediaInput {
         #[arg(value_parser=parse_duration)]
         cursor: time::Duration,
     },
+    /// Starts playing the media input
+    Play {
+        /// The name of media input
+        name: String,
+    },
+    /// Pauses the media input
+    Pause {
+        /// The name of media input
+        name: String,
+    },
+    /// Stops the media input
+    Stop {
+        /// The name of media input
+        name: String,
+    },
+    /// Restarts the media input
+    Restart {
+        /// The name of media input
+        name: String,
+    },
 }
 
 // Parses strings of such format:

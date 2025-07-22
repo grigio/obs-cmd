@@ -2,6 +2,7 @@ mod command;
 use command::*;
 
 use clap::Parser;
+use obws::common::MediaAction;
 use obws::requests::scene_items::Id as IdItem;
 use obws::requests::scene_items::SetEnabled as SetEnabledItem;
 use obws::requests::sources::SaveScreenshot;
@@ -43,7 +44,35 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Commands::MediaInput(media_input) => match media_input {
             MediaInput::SetCursor { name, cursor } => {
                 client.media_inputs().set_cursor(name, *cursor).await?;
-                println!("Media input cursor was set to: {cursor:?}")
+                println!("Media input {name}'s cursor was set to: {cursor:?}");
+            }
+            MediaInput::Play { name } => {
+                client
+                    .media_inputs()
+                    .trigger_action(name, MediaAction::Play)
+                    .await?;
+                println!("Media input {name} is playing");
+            }
+            MediaInput::Restart { name } => {
+                client
+                    .media_inputs()
+                    .trigger_action(name, MediaAction::Restart)
+                    .await?;
+                println!("Media input {name} is restarted");
+            }
+            MediaInput::Pause { name } => {
+                client
+                    .media_inputs()
+                    .trigger_action(name, MediaAction::Pause)
+                    .await?;
+                println!("Media input {name} is paused");
+            }
+            MediaInput::Stop { name } => {
+                client
+                    .media_inputs()
+                    .trigger_action(name, MediaAction::Stop)
+                    .await?;
+                println!("Media input {name} is stopped");
             }
         },
         Commands::Scene(action) => {

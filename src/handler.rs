@@ -173,7 +173,7 @@ pub async fn handle_commands(
             file_path,
         } => {
             let settings = SaveScreenshot {
-                source: source.as_str().into(),
+                source: obws::requests::sources::SourceId::Name(source.as_str()),
                 format,
                 width: *width,
                 height: *height,
@@ -355,7 +355,7 @@ pub async fn handle_commands(
                 .scene_items()
                 .id(IdItem {
                     scene: scene.as_str().into(),
-                    source: source.as_str().into(),
+                    source: source.as_str(),
                     search_offset: Some(0),
                 })
                 .await?;

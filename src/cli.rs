@@ -54,6 +54,7 @@ impl FromStr for ObsWebsocket {
 }
 
 #[derive(Subcommand, Clone, Debug)]
+#[allow(clippy::enum_variant_names)]
 pub enum Replay {
     Start,
     Stop,
@@ -223,7 +224,7 @@ pub enum MediaInput {
 fn parse_duration(s: &str) -> Result<time::Duration, String> {
     let parts = s
         .split_terminator(':')
-        .map(|part| i64::from_str(part))
+        .map(i64::from_str)
         .collect::<Vec<_>>();
 
     match parts.as_slice() {

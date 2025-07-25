@@ -37,7 +37,7 @@ jobs:
       - name: Install Rust
         run: rustup update --no-self-update stable
       - name: Run cargo-tarpaulin
-        uses: actions-rs/tarpaulin@v0.1
+        uses: cargo-tarpaulin/cargo-tarpaulin-action@v1
         with:
           args: '--out Xml'
       - name: Upload to codecov.io

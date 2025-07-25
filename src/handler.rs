@@ -8,7 +8,10 @@ use obws::requests::scene_items::SetEnabled as SetEnabledItem;
 use obws::requests::sources::SaveScreenshot;
 use obws::Client;
 
-pub async fn handle_commands(client: &Client, commands: &Commands) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn handle_commands(
+    client: &Client,
+    commands: &Commands,
+) -> Result<(), Box<dyn std::error::Error>> {
     match commands {
         Commands::MediaInput(media_input) => match media_input {
             MediaInput::SetCursor { name, cursor } => {

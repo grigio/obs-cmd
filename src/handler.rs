@@ -56,15 +56,15 @@ pub async fn handle_commands(
             match action {
                 Current => {
                     let scene_name = client.scenes().current_program_scene().await?;
-                    println!("{:?}", scene_name);
+                    println!("{scene_name:?}");
                 }
                 Switch { scene_name } => {
                     let res = client
                         .scenes()
                         .set_current_program_scene(scene_name.as_str())
                         .await;
-                    println!("Set current scene: switch {:?}", scene_name);
-                    println!("Result: {:?}", res);
+                    println!("Set current scene: switch {scene_name:?}");
+                    println!("Result: {res:?}");
                     res?;
                 }
             }
@@ -76,7 +76,7 @@ pub async fn handle_commands(
             match action {
                 Current => {
                     let scene_collection_name = client.scene_collections().current().await?;
-                    println!("{:?}", scene_collection_name);
+                    println!("{scene_collection_name:?}");
                 }
                 Switch {
                     scene_collection_name,
@@ -85,8 +85,8 @@ pub async fn handle_commands(
                         .scene_collections()
                         .set_current(scene_collection_name)
                         .await;
-                    println!("Set current scene collection: {:?}", scene_collection_name);
-                    println!("Result: {:?}", res);
+                    println!("Set current scene collection: {scene_collection_name:?}");
+                    println!("Result: {res:?}");
                     res?;
                 }
             }
@@ -94,30 +94,30 @@ pub async fn handle_commands(
 
         Commands::Info => {
             let version = client.general().version().await?;
-            println!("Version: {:?}", version);
+            println!("Version: {version:?}");
         }
 
         Commands::Recording(action) => {
             use Recording::*;
-            println!("Recording {:?}", action);
+            println!("Recording {action:?}");
 
             match action {
                 Start => {
                     let res = client.recording().start().await;
                     println!("Start recording");
-                    println!("Result: {:?}", res);
+                    println!("Result: {res:?}");
                     res?;
                 }
                 Stop => {
                     let res = client.recording().stop().await;
                     println!("Stop recording");
-                    println!("Result: {:?}", res);
+                    println!("Result: {res:?}");
                     res?;
                 }
                 Toggle => {
                     let res = client.recording().toggle().await;
                     println!("Toggle recording");
-                    println!("Result: {:?}", res);
+                    println!("Result: {res:?}");
                     res?;
                 }
                 Status => {
@@ -146,19 +146,19 @@ pub async fn handle_commands(
                 Pause => {
                     let res = client.recording().pause().await;
                     println!("Pause recording");
-                    println!("Result: {:?}", res);
+                    println!("Result: {res:?}");
                     res?;
                 }
                 Resume => {
                     let res = client.recording().resume().await;
                     println!("Resume recording");
-                    println!("Result: {:?}", res);
+                    println!("Result: {res:?}");
                     res?;
                 }
                 TogglePause => {
                     let res = client.recording().toggle_pause().await;
                     println!("Toggle recording pause");
-                    println!("Result: {:?}", res);
+                    println!("Result: {res:?}");
                     res?;
                 }
             }
@@ -181,24 +181,24 @@ pub async fn handle_commands(
                 file_path,
             };
             client.sources().save_screenshot(settings).await?;
-            println!("Saved screenshot to path: {:?}", file_path);
+            println!("Saved screenshot to path: {file_path:?}");
         }
 
         Commands::Streaming(action) => {
             use Streaming::*;
-            println!("Streaming {:?}", action);
+            println!("Streaming {action:?}");
 
             match action {
                 Start => {
                     let res = client.streaming().start().await;
                     println!("Start streaming");
-                    println!("Result: {:?}", res);
+                    println!("Result: {res:?}");
                     res?;
                 }
                 Stop => {
                     let res = client.streaming().stop().await;
                     println!("Stop streaming");
-                    println!("Result: {:?}", res);
+                    println!("Result: {res:?}");
                     res?;
                 }
                 Status => {
@@ -208,59 +208,59 @@ pub async fn handle_commands(
                 Toggle => {
                     let res = client.streaming().toggle().await?;
                     println!("Toggle streaming");
-                    println!("Result: {:?}", res);
+                    println!("Result: {res:?}");
                 }
             }
         }
 
         Commands::VirtualCamera(action) => {
             use VirtualCamera::*;
-            println!("VirtualCamera {:?}", action);
+            println!("VirtualCamera {action:?}");
 
             match action {
                 Start => {
                     let res = client.virtual_cam().start().await;
-                    println!("Result: {:?}", res);
+                    println!("Result: {res:?}");
                     res?;
                 }
                 Stop => {
                     let res = client.virtual_cam().stop().await;
-                    println!("Result: {:?}", res);
+                    println!("Result: {res:?}");
                     res?;
                 }
                 Toggle => {
                     let res = client.virtual_cam().toggle().await?;
-                    println!("Result: {:?}", res);
+                    println!("Result: {res:?}");
                 }
             }
         }
 
         Commands::Replay(action) => {
             use Replay::*;
-            println!("Replay {:?}", action);
+            println!("Replay {action:?}");
 
             match action {
                 Start => {
                     let res = client.replay_buffer().start().await;
                     println!("Start Replay Buffer");
-                    println!("Result: {:?}", res);
+                    println!("Result: {res:?}");
                     res?;
                 }
                 Stop => {
                     let res = client.replay_buffer().stop().await;
                     println!("Stop Replay Buffer");
-                    println!("Result: {:?}", res);
+                    println!("Result: {res:?}");
                     res?;
                 }
                 Toggle => {
                     let res = client.replay_buffer().toggle().await?;
                     println!("Toggle Replay Buffer");
-                    println!("Result: {:?}", res);
+                    println!("Result: {res:?}");
                 }
                 Save => {
                     println!("Save buffer");
                     let res = client.replay_buffer().save().await;
-                    println!("Result: {:?}", res);
+                    println!("Result: {res:?}");
                     res?;
                 }
                 Status => {
@@ -277,13 +277,13 @@ pub async fn handle_commands(
                         println!("{error_message}");
                         Err(error_message)?;
                     }
-                    println!("Replay path: {:?}", res);
+                    println!("Replay path: {res:?}");
                 }
             }
         }
 
         Commands::Audio { command, device } => {
-            println!("Audio: {:?} {:?}", command, device);
+            println!("Audio: {command:?} {device:?}");
 
             let muted: bool = match command.as_str() {
                 "mute" => true,
@@ -291,11 +291,11 @@ pub async fn handle_commands(
                 "toggle" => !client.inputs().muted(device.as_str().into()).await?,
                 "status" => {
                     let status = client.inputs().muted(device.as_str().into()).await?;
-                    println!("Muted: {:?}", status);
+                    println!("Muted: {status:?}");
                     return Ok(());
                 }
                 _ => {
-                    let error_message = format!("Invalid audio command: {:?}", command);
+                    let error_message = format!("Invalid audio command: {command:?}");
                     println!("{error_message}");
                     return Err(error_message)?;
                 }
@@ -304,7 +304,7 @@ pub async fn handle_commands(
                 .inputs()
                 .set_muted(device.as_str().into(), muted)
                 .await;
-            println!("Result: {:?}", res);
+            println!("Result: {res:?}");
             res?;
         }
 
@@ -313,7 +313,7 @@ pub async fn handle_commands(
             source,
             filter,
         } => {
-            println!("Filter: {:?} {:?} {:?}", command, source, filter);
+            println!("Filter: {command:?} {source:?} {filter:?}");
 
             let enabled: bool = match command.as_str() {
                 "enable" => true,
@@ -326,7 +326,7 @@ pub async fn handle_commands(
                         .enabled
                 }
                 _ => {
-                    let error_message = format!("Invalid filter command: {:?}", command);
+                    let error_message = format!("Invalid filter command: {command:?}");
                     println!("{error_message}");
                     return Err(error_message)?;
                 }
@@ -339,7 +339,7 @@ pub async fn handle_commands(
                     enabled,
                 })
                 .await;
-            println!("Result: {:?}", res);
+            println!("Result: {res:?}");
             res?;
         }
 
@@ -348,7 +348,7 @@ pub async fn handle_commands(
             scene,
             source,
         } => {
-            println!("Scene Item: {:?} {:?} {:?}", command, scene, source);
+            println!("Scene Item: {command:?} {scene:?} {source:?}");
 
             // get item_id
             let item_id = client
@@ -371,7 +371,7 @@ pub async fn handle_commands(
                         .await?
                 }
                 _ => {
-                    let error_message = format!("Invalid scene item command: {:?}", command);
+                    let error_message = format!("Invalid scene item command: {command:?}");
                     println!("{error_message}");
                     return Err(error_message)?;
                 }
@@ -384,14 +384,14 @@ pub async fn handle_commands(
                     enabled,
                 })
                 .await;
-            println!("Result: {:?}", res);
+            println!("Result: {res:?}");
             res?;
         }
 
         Commands::TriggerHotkey { name } => {
-            println!("Trigger Hotkey: {:?}", name);
+            println!("Trigger Hotkey: {name:?}");
             let res = client.hotkeys().trigger_by_name(name, None).await;
-            println!("Result: {:?}", res);
+            println!("Result: {res:?}");
             res?;
         }
 
@@ -411,7 +411,7 @@ pub async fn handle_commands(
                             location: Some(MonitorLocationIndex(*monitor_index as i32)),
                         })
                         .await;
-                    println!("Result: {:?}", res);
+                    println!("Result: {res:?}");
                     res?;
                 } else {
                     Err("Monitor not in list")?;
@@ -439,7 +439,7 @@ pub async fn handle_commands(
                             location: Some(MonitorLocationIndex(*monitor_index as i32)),
                         })
                         .await;
-                    println!("Result: {:?}", res);
+                    println!("Result: {res:?}");
                     res?;
                 } else {
                     Err("Monitor not in list")?;

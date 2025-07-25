@@ -11,10 +11,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Install Rust toolchain
-        run: rustup show
-      - name: Install components
-        run: rustup component add clippy rustfmt
+      - name: Install Rust
+        run: rustup update --no-self-update stable
       - name: Run cargo fmt
         run: cargo fmt -- --check
       - name: Run cargo clippy
@@ -28,7 +26,5 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Install Rust toolchain
-        run: rustup show
       - name: Run tests
         run: cargo test

@@ -4,7 +4,7 @@ version = "0.19.1"
 edition = "2021"
 description = "A minimal command to control obs via obs-websocket"
 authors = ["Luigi Maselli <luigi@grigio.org>"]
-rust-version = "1.78.0"
+rust-version = "1.88.0"
 
 [[bin]]
 name = "obs-cmd"

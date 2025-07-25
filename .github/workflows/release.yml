@@ -6,14 +6,13 @@ on:
       - 'v[0-9]+.[0-9]+.[0-9]+*'
 
 jobs:
-
   desktop:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [debian-latest, macos-latest, windows-latest]
         include:
-          - os: ubuntu-latest
+          - os: debian-latest
             artifact_name: ./target/release/obs-cmd
             asset_name: obs-cmd-linux-amd64
           
@@ -34,16 +33,15 @@ jobs:
       run: cargo build --release
 
     - name: Upload binaries
-      uses: svenstaro/upload-release-action@2.9.0
+      uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: ${{ matrix.artifact_name }}
         asset_name: ${{ matrix.asset_name }}
         tag: ${{ github.ref }}
 
-    
   embedded:
-    runs-on: ubuntu-24.04
+    runs-on: debian-latest
     steps:
     - name: Check out code
       uses: actions/checkout@v4
@@ -55,7 +53,7 @@ jobs:
       run: cross build --target aarch64-unknown-linux-gnu --release
 
     - name: Upload binaries to release
-      uses: svenstaro/upload-release-action@2.9.0
+      uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: target/aarch64-unknown-linux-gnu/release/obs-cmd

@@ -1,79 +1,48 @@
 name: CI
 
-on: [push, pull_request] 
+on: [push, pull_request]
 
 jobs:
-
-  # fmt:
-  #   runs-on: ubuntu-latest
-
-  #   steps:
-
-  #   - name: Checkout code
-  #     uses: actions/checkout@v4
-
-  #   - name: Run clippy
-  #     run: cargo fmt -- --check
-
-
-  # clippy:
-  #   runs-on: ubuntu-22.04
-
-  #   steps:
-
-  #   - name: Checkout code
-  #     uses: actions/checkout@v4
-
-  #   - name: Install Rust
-  #     run: |
-  #       rustup update --no-self-update stable
-  #       rustup component add clippy
-
-  #   - name: Run clippy
-  #     run: cargo clippy -- -D warnings
-
+  lint:
+    runs-on: debian-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install Rust
+        run: rustup update --no-self-update stable
+      - name: Run cargo fmt
+        run: cargo fmt -- --check
+      - name: Run cargo clippy
+        run: cargo clippy -- -D warnings
 
   test:
     strategy:
       matrix:
-        platform: [ubuntu-latest]
-
+        platform: [debian-latest]
     runs-on: ${{ matrix.platform }}
-
     steps:
-
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Run tests
-      run: cargo test
-
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Run tests
+        run: cargo test
 
   coverage:
-    runs-on: ubuntu-latest
-
+    runs-on: debian-latest
     steps:
-
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Install cargo-tarpaulin
-      run: |
-        LINK="https://github.com/xd009642/tarpaulin/releases/download/0.31.5/cargo-tarpaulin-x86_64-unknown-linux-gnu.tar.gz"
-        curl -L --output tarpaulin.tar.gz "$LINK"
-        tar -xzvf tarpaulin.tar.gz
-        chmod +x cargo-tarpaulin
-
-    - name: Run cargo-tarpaulin
-      run: ./cargo-tarpaulin tarpaulin --out Xml
-
-    - name: Upload to codecov.io
-      uses: codecov/codecov-action@v5.4.0
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-
-    - name: Archive code coverage results
-      uses: actions/upload-artifact@v4
-      with:
-        name: code-coverage-report
-        path: cobertura.xml
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install Rust
+        run: rustup update --no-self-update stable
+      - name: Run cargo-tarpaulin
+        uses: actions-rs/tarpaulin@v0.1
+        with:
+          args: '--out Xml'
+      - name: Upload to codecov.io
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-coverage-report
+          path: cobertura.xml

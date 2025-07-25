@@ -235,7 +235,7 @@ fn parse_duration(s: &str) -> Result<time::Duration, String> {
 
 #[cfg(test)]
 mod tests {
-    use crate::command::parse_duration;
+    use super::parse_duration;
 
     #[test]
     fn test_parse_duration() {

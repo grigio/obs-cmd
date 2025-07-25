@@ -593,7 +593,7 @@ dependencies = [
 
 [[package]]
 name = "obs-cmd"
-version = "0.18.5"
+version = "0.19.0"
 dependencies = [
  "clap",
  "obws",

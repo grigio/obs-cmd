@@ -1,133 +1,91 @@
-# obs-cmd - a minimal obs CLI for obs-websocket v5
+# obs-cmd
 
-I was used to [obs-cli](https://github.com/muesli/obs-cli/pull/64) but it doesn't support `obs-websocket` 5
+**obs-cmd** is a lightweight, command-line interface for controlling OBS Studio via the obs-websocket v5 protocol. It provides a simple and efficient way to automate your streaming and recording workflows.
 
-[![release](https://github.com/grigio/obs-cmd/actions/workflows/release.yml/badge.svg)](https://github.com/grigio/obs-cmd/actions/workflows/release.yml)
+[![Release](https://github.com/grigio/obs-cmd/actions/workflows/release.yml/badge.svg)](https://github.com/grigio/obs-cmd/actions/workflows/release.yml)
 
-### Usage
+## Features
 
-Just a minimal API is supported
+- **Scene Management**: Switch between scenes and scene collections.
+- **Recording & Streaming**: Start, stop, and toggle recording and streaming.
+- **Source Control**: Toggle filters, mute audio sources, and manage scene items.
+- **Camera Control**: Start and stop the virtual camera.
+- **Replay Buffer**: Manage the replay buffer, including saving replays.
+- **Hotkeys**: Trigger OBS hotkeys by name.
+- **Projectors**: Open fullscreen and source projectors.
+- **Media Inputs**: Control media playback, including play, pause, and restart.
 
-```
-obs-cmd --help
-obs-cmd scene switch <scene>
-obs-cmd scene switch @cam-front
-obs-cmd scene-collection switch <collection>
-obs-cmd scene-item toggle <scene> <item>
-obs-cmd toggle-mute Mic/Aux
-obs-cmd recording start
-obs-cmd recording stop
-obs-cmd recording toggle
-obs-cmd recording pause
-obs-cmd recording resume
-obs-cmd recording toggle-pause
-obs-cmd recording status
-obs-cmd recording status-active
-obs-cmd streaming start
-obs-cmd virtualcam start
-obs-cmd save-screenshot <source> <format> <file_path> [--width WIDTH] [--height HEIGHT] [--compression-quality COMPRESSION_QUALITY]
-obs-cmd replay toggle
-obs-cmd replay save
-obs-cmd replay status
-obs-cmd replay last-replay
-obs-cmd trigger-hotkey
-obs-cmd fullscreen-projector [--monitor-index INDEX]
-obs-cmd source-projector <source-name> [--monitor-index INDEX]
-obs-cmd info
-obs-cmd media-input set-cursor MyBgVideo 10:00
-obs-cmd media-input play MyBgVideo
-obs-cmd media-input pause MyBgVideo
-obs-cmd media-input restart MyBgVideo
-obs-cmd --websocket obsws://localhost:4455/secret info # You can override the default `obsws` url
-OBS_WEBSOCKET_URL=obsws://localhost:4455/secret obs-cmd info
+## Installation
+
+### Binaries
+
+You can download the latest pre-compiled binaries for your operating system from the [Releases](https://github.com/grigio/obs-cmd/releases/latest) page.
+
+**Linux/macOS:**
+```bash
+# Download the appropriate binary for your system
+curl -L https://github.com/grigio/obs-cmd/releases/latest/download/obs-cmd-linux-amd64 -o obs-cmd
+chmod +x obs-cmd
+sudo mv obs-cmd /usr/local/bin/
 ```
 
-You can override the websocket URL, which can be found in OBS -> Tools -> WebSocket Server Settings. `localhost` for the hostname will work for most, instead of the full IP address. If you set the password as `secret` you can avoid to specify the `--websocket` argument.
+### From Source
 
-### Installation
+Ensure you have [Rust](https://www.rust-lang.org/tools/install) installed, then run the following commands:
 
-
-### Using the provided Binaries
-Download `obs-cmd`, pick the correct binary for your OS, example `obs-cmd-linux-amd64`
-
-https://github.com/grigio/obs-cmd/releases/latest
-
-type in the terminal:
-
-```
-chmod +x obs-cmd-linux-amd64 && sudo mv obs-cmd-linux-amd64 /usr/local/bin/obs-cmd
-```
-
-### Installing From Source
-First ensure that Rust is installed on your system. Clone the repo to your local system:
-
-```
+```bash
 git clone https://github.com/grigio/obs-cmd.git
-```
-
-Next `cd` into the cloned directory then at the top-level of the directory run:
-
-```
-cargo build --release
-```
-
-Once the build is complete you may move the produce binary into an approriate binary location, such as `/usr/local/bin`:
-
-```
-sudo cp target/release/obs-cmd /usr/local/bin/obs-cmd
-```
-
-### Installing on Arch Linux
-The `obs-cmd` package is maintained on the [Arch User Repository](https://aur.archlinux.org/packages/obs-cmd).
-
-Ensure that [rust](https://archlinux.org/packages/extra/x86_64/rust/) is installed for access to `cargo`.
-
-To install `obs-cmd` you can either use an AUR helper of your choice such as [yay](https://aur.archlinux.org/packages/yay) or [aurman](https://aur.archlinux.org/packages/aurman) or download the PKGBUILD directly and use makepkg to produce the finished package:
-```
-wget https://aur.archlinux.org/cgit/aur.git/snapshot/obs-cmd.tar.gz
-```
-
-Untar the .tar.gz file:
-```
-tar xvzf obs-cmd.tar.gz
-```
-
-`cd` into the directory:
-```
 cd obs-cmd
+cargo install --path .
 ```
 
-Run makepkg to produce the installable package:
-```
-makepkg -s
-```
+### Arch Linux
 
-And finally use pacman to install the produced package (*your version number may vary*):
-```
-sudo pacman -U obs-cmd-0.15.3-1-x86_64.pkg.tar.zst
+`obs-cmd` is available on the Arch User Repository (AUR). You can install it using an AUR helper like `yay`:
+
+```bash
+yay -S obs-cmd
 ```
 
+## Usage
 
-### Example Usage
+`obs-cmd` connects to the OBS WebSocket server. By default, it attempts to connect to `obsws://localhost:4455` with the password `secret`. You can configure the WebSocket settings in OBS under **Tools → WebSocket Server Settings**.
+
+To override the default connection settings, you can use the `--websocket` flag or set the `OBS_WEBSOCKET_URL` environment variable:
+
+```bash
+# Using the --websocket flag
+obs-cmd --websocket obsws://<hostname>:<port>/<password> <command>
+
+# Using an environment variable
+export OBS_WEBSOCKET_URL=obsws://<hostname>:<port>/<password>
+obs-cmd <command>
 ```
-$ obs-cmd recording start
-Recording started
-Result: Ok(())
-$ obs-cmd recording stop
 
-$ obs-cmd info
-Version: Version { obs_version: Version { major: 29, minor: 1, patch: 1 }, obs_web_socket_version: Version { major: 5, minor: 2, patch: 2 }, rpc_version: 1, available_requests: ..
+### Examples
 
-$ obs-cmd save-screenshot "OBS Source" "jpg" "/home/user/screenshot/test.jpg" --width 1920 --height 1080 --compression-quality 100
-Saved screenshot to path: "/home/user/screenshot/test.jpg"
+```bash
+# Switch to a scene named "Live"
+obs-cmd scene switch Live
+
+# Start recording
+obs-cmd recording start
+
+# Toggle the mute state of an audio source
+obs-cmd audio toggle "Mic/Aux"
+
+# Save a screenshot of a source
+obs-cmd save-screenshot "Webcam" "png" "/path/to/screenshot.png"
+```
+
+For a full list of commands and options, run:
+```bash
+obs-cmd --help
 ```
 
 ## Donations
 
-Donations are welcome and will go towards further development of this project
+If you find this project helpful, please consider making a donation to support its development.
 
-```
-monero:88LyqYXn4LdCVDtPWKuton9hJwbo8ZduNEGuARHGdeSJ79BBYWGpMQR8VGWxGDKtTLLM6E9MJm8RvW9VMUgCcSXu19L9FSv
-bitcoin:bc1q6mh77hfv8x8pa0clzskw6ndysujmr78j6se025
-lightning:techonsapevole@getalby.com
-```
+- **Monero**: `88LyqYXn4LdCVDtPWKuton9hJwbo8ZduNEGuARHGdeSJ79BBYWGpMQR8VGWxGDKtTLLM6E9MJm8RvW9VMUgCcSXu19L9FSv`
+- **Bitcoin**: `bc1q6mh77hfv8x8pa0clzskw6ndysujmr78j6se025`

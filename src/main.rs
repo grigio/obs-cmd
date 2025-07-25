@@ -43,34 +43,37 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     match &cli.command {
         Commands::MediaInput(media_input) => match media_input {
             MediaInput::SetCursor { name, cursor } => {
-                client.media_inputs().set_cursor(name, *cursor).await?;
+                client
+                    .media_inputs()
+                    .set_cursor(name.as_str().into(), *cursor)
+                    .await?;
                 println!("Media input {name}'s cursor was set to: {cursor:?}");
             }
             MediaInput::Play { name } => {
                 client
                     .media_inputs()
-                    .trigger_action(name, MediaAction::Play)
+                    .trigger_action(name.as_str().into(), MediaAction::Play)
                     .await?;
                 println!("Media input {name} is playing");
             }
             MediaInput::Restart { name } => {
                 client
                     .media_inputs()
-                    .trigger_action(name, MediaAction::Restart)
+                    .trigger_action(name.as_str().into(), MediaAction::Restart)
                     .await?;
                 println!("Media input {name} is restarted");
             }
             MediaInput::Pause { name } => {
                 client
                     .media_inputs()
-                    .trigger_action(name, MediaAction::Pause)
+                    .trigger_action(name.as_str().into(), MediaAction::Pause)
                     .await?;
                 println!("Media input {name} is paused");
             }
             MediaInput::Stop { name } => {
                 client
                     .media_inputs()
-                    .trigger_action(name, MediaAction::Stop)
+                    .trigger_action(name.as_str().into(), MediaAction::Stop)
                     .await?;
                 println!("Media input {name} is stopped");
             }
@@ -84,7 +87,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     println!("{:?}", scene_name);
                 }
                 Switch { scene_name } => {
-                    let res = client.scenes().set_current_program_scene(scene_name).await;
+                    let res = client
+                        .scenes()
+                        .set_current_program_scene(scene_name.as_str())
+                        .await;
                     println!("Set current scene: switch {:?}", scene_name);
                     println!("Result: {:?}", res);
                     res?;
@@ -195,7 +201,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             file_path,
         } => {
             let settings = SaveScreenshot {
-                source,
+                source: source.as_str().into(),
                 format,
                 width: *width,
                 height: *height,
@@ -310,9 +316,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let muted: bool = match command.as_str() {
                 "mute" => true,
                 "unmute" => false,
-                "toggle" => !client.inputs().muted(device).await?,
+                "toggle" => !client.inputs().muted(device.as_str().into()).await?,
                 "status" => {
-                    let status = client.inputs().muted(device).await?;
+                    let status = client.inputs().muted(device.as_str().into()).await?;
                     println!("Muted: {:?}", status);
                     return Ok(());
                 }
@@ -322,7 +328,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     return Err(error_message)?;
                 }
             };
-            let res = client.inputs().set_muted(device, muted).await;
+            let res = client
+                .inputs()
+                .set_muted(device.as_str().into(), muted)
+                .await;
             println!("Result: {:?}", res);
             res?;
         }
@@ -337,7 +346,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let enabled: bool = match command.as_str() {
                 "enable" => true,
                 "disable" => false,
-                "toggle" => !client.filters().get(source, filter).await?.enabled,
+                "toggle" => {
+                    !client
+                        .filters()
+                        .get(source.as_str().into(), filter)
+                        .await?
+                        .enabled
+                }
                 _ => {
                     let error_message = format!("Invalid filter command: {:?}", command);
                     println!("{error_message}");
@@ -347,7 +362,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let res = client
                 .filters()
                 .set_enabled(SetEnabledFilter {
-                    source,
+                    source: source.as_str().into(),
                     filter,
                     enabled,
                 })
@@ -367,8 +382,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let item_id = client
                 .scene_items()
                 .id(IdItem {
-                    scene,
-                    source,
+                    scene: scene.as_str().into(),
+                    source: source.as_str().into(),
                     search_offset: Some(0),
                 })
                 .await?;
@@ -377,7 +392,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let enabled: bool = match command.as_str() {
                 "enable" => true,
                 "disable" => false,
-                "toggle" => !client.scene_items().enabled(scene, item_id).await?,
+                "toggle" => {
+                    !client
+                        .scene_items()
+                        .enabled(scene.as_str().into(), item_id)
+                        .await?
+                }
                 _ => {
                     let error_message = format!("Invalid scene item command: {:?}", command);
                     println!("{error_message}");
@@ -387,7 +407,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let res = client
                 .scene_items()
                 .set_enabled(SetEnabledItem {
-                    scene,
+                    scene: scene.as_str().into(),
                     item_id,
                     enabled,
                 })
@@ -398,7 +418,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         Commands::TriggerHotkey { name } => {
             println!("Trigger Hotkey: {:?}", name);
-            let res = client.hotkeys().trigger_by_name(name).await;
+            let res = client.hotkeys().trigger_by_name(name, None).await;
             println!("Result: {:?}", res);
             res?;
         }
@@ -443,7 +463,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     let res = client
                         .ui()
                         .open_source_projector(OpenSourceProjector {
-                            source: name,
+                            source: name.as_str().into(),
                             location: Some(MonitorLocationIndex(*monitor_index as i32)),
                         })
                         .await;

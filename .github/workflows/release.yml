@@ -29,6 +29,9 @@ jobs:
     - name: Check out code
       uses: actions/checkout@v4
 
+    - name: Install Rust toolchain
+      run: rustup show
+
     - name: Build
       run: cargo build --release
 
@@ -45,6 +48,9 @@ jobs:
     steps:
     - name: Check out code
       uses: actions/checkout@v4
+
+    - name: Install Rust toolchain
+      run: rustup show
     
     - name: Install cross
       run: cargo install cross

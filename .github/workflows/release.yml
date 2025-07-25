@@ -10,9 +10,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [debian-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
         include:
-          - os: debian-latest
+          - os: ubuntu-latest
             artifact_name: ./target/release/obs-cmd
             asset_name: obs-cmd-linux-amd64
           
@@ -41,7 +41,7 @@ jobs:
         tag: ${{ github.ref }}
 
   embedded:
-    runs-on: debian-latest
+    runs-on: ubuntu-latest
     steps:
     - name: Check out code
       uses: actions/checkout@v4

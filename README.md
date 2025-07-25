@@ -47,6 +47,14 @@ cargo install --path .
 yay -S obs-cmd
 ```
 
+### Gentoo Linux
+
+`media-video/obs-cmd` is available on [Project:GURU](https://wiki.gentoo.org/wiki/Project:GURU/Information_for_End_Users).
+
+```bash
+sudo emerge -av media-video/obs-cmd
+```
+
 ## Usage
 
 `obs-cmd` connects to the OBS WebSocket server. By default, it attempts to connect to `obsws://localhost:4455` with the password `secret`. You can configure the WebSocket settings in OBS under **Tools → WebSocket Server Settings**.

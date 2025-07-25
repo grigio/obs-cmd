@@ -83,6 +83,10 @@ For a full list of commands and options, run:
 obs-cmd --help
 ```
 
+On Linux/GNOME you can map `obs-cmd` commands as global shortcuts.
+
+![Example usage on Linux](https://private-user-images.githubusercontent.com/8074/426738958-51872710-4a28-4437-a1e1-41d1838a5a29.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NTM0MzI3NDIsIm5iZiI6MTc1MzQzMjQ0MiwicGF0aCI6Ii84MDc0LzQyNjczODk1OC01MTg3MjcxMC00YTI4LTQ0MzctYTFlMS00MWQxODM4YTVhMjkucG5nP1gtQW16LUFsZ29yaXRobT1BV1M0LUhNQUMtU0hBMjU2JlgtQW16LUNyZWRlbnRpYWw9QUtJQVZDT0RZTFNBNTNQUUs0WkElMkYyMDI1MDcyNSUyRnVzLWVhc3QtMSUyRnMzJTJGYXdzNF9yZXF1ZXN0JlgtQW16LURhdGU9MjAyNTA3MjVUMDgzNDAyWiZYLUFtei1FeHBpcmVzPTMwMCZYLUFtei1TaWduYXR1cmU9YmM1ODhlMjBkNjY5MGI3OWM3YWU4NTJhYzBmN2NjOGI4MWViMzIzMzMzNTkxNTM1MDAwOTMzMzU1ZTI0NjY5ZiZYLUFtei1TaWduZWRIZWFkZXJzPWhvc3QifQ.kH22xUupaDmjxlQfjiDtXSJtwAvN4Tu1AyCSafxsqR0)
+
 ## Donations
 
 If you find this project helpful, please consider making a donation to support its development.

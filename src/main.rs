@@ -6,7 +6,7 @@ mod handler;
 use clap::Parser;
 use cli::{Cli, ObsWebsocket};
 use connection::{connect_with_retry, ConnectionConfig};
-use error::Result;
+use error::{ObsCmdError, Result};
 use handler::handle_commands;
 
 #[tokio::main]
@@ -21,15 +21,27 @@ async fn main() -> Result<()> {
             let parsed_url = url::Url::parse(&url)?;
             let hostname = parsed_url
                 .host_str()
-                .ok_or(url::ParseError::RelativeUrlWithoutBase)?
+                .ok_or_else(|| {
+                    ObsCmdError::WebSocketUrlParseError(
+                        "Missing hostname in WebSocket URL".to_string(),
+                    )
+                })?
                 .to_string();
             let port = parsed_url
                 .port()
-                .ok_or(url::ParseError::RelativeUrlWithoutBase)?;
+                .ok_or_else(|| {
+                    ObsCmdError::WebSocketUrlParseError(
+                        "Missing port in WebSocket URL".to_string(),
+                    )
+                })?;
             let password = parsed_url
                 .path_segments()
                 .and_then(|mut segments| segments.next())
-                .ok_or(url::ParseError::RelativeUrlWithoutBase)?;
+                .ok_or_else(|| {
+                    ObsCmdError::WebSocketUrlParseError(
+                        "Missing password in WebSocket URL path".to_string(),
+                    )
+                })?;
 
             connect_with_retry(hostname, port, Some(password.to_string()), config).await?
         }

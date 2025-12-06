@@ -22,7 +22,10 @@ impl FromStr for ObsWebsocket {
                     );
                 }
 
-                let hostname = unvalidated_websocket.host().unwrap().to_string();
+                let hostname = unvalidated_websocket
+                    .host()
+                    .ok_or("Invalid hostname in URL")?
+                    .to_string();
 
                 let port =
                     match unvalidated_websocket.port() {

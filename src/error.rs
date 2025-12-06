@@ -40,8 +40,22 @@ pub enum ObsCmdError {
     #[error("No last replay found")]
     NoLastReplay,
 
+    #[allow(dead_code)]
     #[error("OBS operation failed: {0}")]
     ObsOperationError(String),
+
+    #[allow(dead_code)]
+    #[error("Invalid URL format: {0}")]
+    InvalidUrlFormat(String),
+
+    #[error("Connection timeout after {timeout} seconds")]
+    ConnectionTimeout { timeout: u64 },
+
+    #[error("All {attempts} connection attempts failed")]
+    AllConnectionAttemptsFailed { attempts: u32 },
+
+    #[error("WebSocket URL parsing failed: {0}")]
+    WebSocketUrlParseError(String),
 }
 
 pub type Result<T> = std::result::Result<T, ObsCmdError>;

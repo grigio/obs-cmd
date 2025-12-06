@@ -45,9 +45,9 @@ pub async fn connect_with_retry(
                 last_error = Some(ObsCmdError::ConnectionError(e));
             }
             Err(_) => {
-                last_error = Some(ObsCmdError::ObsOperationError(
-                    "Connection timeout".to_string(),
-                ));
+                last_error = Some(ObsCmdError::ConnectionTimeout {
+                    timeout: config.timeout_duration.as_secs(),
+                });
             }
         }
 
@@ -62,14 +62,16 @@ pub async fn connect_with_retry(
     }
 
     Err(last_error.unwrap_or_else(|| {
-        ObsCmdError::ObsOperationError("All connection attempts failed".to_string())
+        ObsCmdError::AllConnectionAttemptsFailed {
+            attempts: config.max_retries,
+        }
     }))
 }
 
 pub async fn check_connection_health(client: &Client) -> Result<()> {
     timeout(Duration::from_secs(5), client.general().version())
         .await
-        .map_err(|_| ObsCmdError::ObsOperationError("Connection health check timeout".to_string()))?
+        .map_err(|_| ObsCmdError::ConnectionTimeout { timeout: 5 })?
         .map_err(ObsCmdError::ConnectionError)?;
 
     Ok(())

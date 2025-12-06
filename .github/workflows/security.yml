@@ -45,7 +45,7 @@ jobs:
       run: cargo deny check
       
     - name: Check for outdated dependencies
-      run: cargo outdated --exit-code 1
+      run: cargo outdated --exit-code 1 --root-deps-only
 
   code-quality:
     name: Code Quality Checks

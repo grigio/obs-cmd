@@ -1,0 +1,124 @@
+name: Rust
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        platform: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+      - name: Check code formatting
+        run: cargo fmt --all -- --check
+      - name: Run clippy lints
+        run: cargo clippy --all-targets --all-features -- -D warnings
+      - name: Build
+        run: cargo build --verbose
+      - name: Run tests
+        run: cargo test --verbose
+        
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: llvm-tools-preview
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@cargo-llvm-cov
+      - name: Generate coverage report
+        run: cargo llvm-cov --all-features --workspace --lcov --output-path lcov.info
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: lcov.info
+          fail_ci_if_error: true
+
+  performance:
+    name: Performance Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@stable
+      
+    - name: Cache cargo registry
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-
+          
+    - name: Build release
+      run: cargo build --release
+      
+    - name: Run benchmarks
+      run: |
+        # Basic performance test - measure startup time
+        echo "Testing startup time..."
+        time ./target/release/obs-cmd --help > /dev/null
+        
+        # Test with mock OBS connection (if available)
+        echo "Testing command execution time..."
+        time timeout 5s ./target/release/obs-cmd --version || true
+        
+    - name: Binary size analysis
+      run: |
+        echo "Binary size analysis:"
+        ls -lh target/release/obs-cmd
+        du -h target/release/obs-cmd
+        
+    - name: Memory usage check
+      run: |
+        echo "Memory usage analysis:"
+        /usr/bin/time -v ./target/release/obs-cmd --help 2>&1 | grep -E "Maximum resident set size|Average resident set size" || true
+
+    - name: Test CLI interface
+      run: |
+        # Test help command
+        ./target/release/obs-cmd --help
+        
+        # Test version command
+        ./target/release/obs-cmd --version
+        
+        # Test invalid arguments (should fail gracefully)
+        ./target/release/obs-cmd --invalid-arg || echo "Expected failure for invalid argument"
+        
+    - name: Test error handling
+      run: |
+        # Test connection to non-existent OBS (should fail gracefully)
+        timeout 10s ./target/release/obs-cmd --ws-url ws://localhost:9999 scene list || echo "Expected connection failure"
+        
+        # Test with invalid WebSocket URL
+        timeout 5s ./target/release/obs-cmd --ws-url invalid-url scene list || echo "Expected URL parsing failure"

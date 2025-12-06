@@ -25,6 +25,13 @@ cargo fmt                    # Format code
 cargo clippy -- -D warnings  # Lint with strict warnings
 cargo test                   # Run tests
 
+# Dependency management
+cargo update                 # Update dependencies
+cargo outdated               # Check for outdated dependencies
+cargo audit                  # Security audit
+cargo deny check             # License and dependency checks
+
+
 # Installation
 cargo install --path .       # Install locally
 ```
@@ -51,3 +58,24 @@ cargo install --path .       # Install locally
 - Result-based error handling throughout
 - Subcommand structure for logical command grouping
 - Environment variable fallback for configuration
+
+## GitHub Workflows
+
+### Development Workflow (rust.yml)
+- **Triggers**: Push/PR to main branch
+- **Platforms**: Ubuntu, macOS, Windows
+- **Jobs**: Testing, code coverage, performance benchmarks
+
+### Security & Quality (security.yml)
+- **Triggers**: Push/PR to main + daily schedule
+- **Jobs**: Security audit, code quality, dependency analysis, secrets scan
+
+### Release Automation (release.yml)
+- **Triggers**: Git tags starting with `v*`
+- **Features**: Multi-platform builds, automatic changelog, GitHub releases
+
+### Branch Protection
+Configure `main` branch to require:
+- Rust workflow checks
+- Security workflow checks
+- Code quality validation

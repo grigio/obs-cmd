@@ -1,61 +1,129 @@
-name: release
+name: Release
 
 on:
   push:
     tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+*'
+      - 'v*'
 
 jobs:
-  desktop:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        include:
-          - os: ubuntu-latest
-            artifact_name: ./target/release/obs-cmd
-            asset_name: obs-cmd-linux-amd64
-          
-          - os: windows-latest
-            artifact_name: ./target/release/obs-cmd.exe
-            asset_name: obs-cmd-windows-amd64.exe
-          
-          - os: macos-latest
-            artifact_name: ./target/release/obs-cmd
-            asset_name: obs-cmd-macos-amd64
-
-    runs-on: ${{ matrix.os }}
-    steps:
-    - name: Check out code
-      uses: actions/checkout@v5
-
-    - name: Build
-      run: cargo build --release
-
-    - name: Upload binaries
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ${{ matrix.artifact_name }}
-        asset_name: ${{ matrix.asset_name }}
-        tag: ${{ github.ref }}
-
-  embedded:
+  create-release:
     runs-on: ubuntu-latest
     steps:
-    - name: Check out code
-      uses: actions/checkout@v5
+      - uses: actions/checkout@v4
+      - name: Extract version
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+        
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Fetch all tags and history
+          git fetch --prune --unshallow
+          
+          # Get the previous tag (excluding the current tag)
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
+          
+          if [ -n "$PREVIOUS_TAG" ]; then
+            echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
+            echo "## Changes since $PREVIOUS_TAG" >> $GITHUB_OUTPUT
+            echo "" >> $GITHUB_OUTPUT
+            git log --pretty=format:"- %s (%h)" $PREVIOUS_TAG..HEAD >> $GITHUB_OUTPUT
+            echo "" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
+            echo "## Initial Release" >> $GITHUB_OUTPUT
+            echo "" >> $GITHUB_OUTPUT
+            echo "First release of obs-cmd - OBS Studio command-line control tool." >> $GITHUB_OUTPUT
+            echo "" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          name: obs-cmd v${{ steps.version.outputs.VERSION }}
+          body: ${{ steps.changelog.outputs.CHANGELOG }}
+          draft: false
+          prerelease: false
+
+  build-release:
+    name: Build release binaries
+    needs: create-release
+    strategy:
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            arch: x64
+            os: linux
+          - target: x86_64-apple-darwin
+            arch: x64
+            os: macos
+          - target: x86_64-pc-windows-msvc
+            arch: x64
+            os: windows
+          - target: aarch64-unknown-linux-gnu
+            arch: arm64
+            os: linux
+          - target: aarch64-apple-darwin
+            arch: arm64
+            os: macos
+    runs-on: ${{ matrix.os == 'windows' && 'windows-latest' || matrix.os == 'macos' && 'macos-latest' || 'ubuntu-latest' }}
     
-    - name: Install cross
-      run: cargo install cross
-
-    - name: Build for aarch64-unknown-linux-gnu
-      run: cross build --target aarch64-unknown-linux-gnu --release
-
-    - name: Upload binaries to release
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: target/aarch64-unknown-linux-gnu/release/obs-cmd
-        asset_name: obs-cmd-aarch64-linux
-        tag: ${{ github.ref }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+          
+      - name: Install cross-compilation tools (Linux ARM64)
+        if: matrix.target == 'aarch64-unknown-linux-gnu'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu
+          rustup target add aarch64-unknown-linux-gnu
+          
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-${{ matrix.target }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.target }}-cargo-
+            
+      - name: Build release binary
+        env:
+          CC: ${{ matrix.target == 'aarch64-unknown-linux-gnu' && 'aarch64-linux-gnu-gcc' || '' }}
+        run: |
+          cargo build --release --target ${{ matrix.target }}
+          
+      - name: Create release archive (Unix)
+        if: matrix.os != 'windows'
+        run: |
+          mkdir -p release
+          cp target/${{ matrix.target }}/release/obs-cmd${{ matrix.os == 'windows' && '.exe' || '' }} release/
+          strip release/obs-cmd${{ matrix.os == 'windows' && '.exe' || '' }} || true
+          tar -czf obs-cmd-${{ matrix.arch }}-${{ matrix.os }}.tar.gz -C release obs-cmd${{ matrix.os == 'windows' && '.exe' || '' }}
+          
+      - name: Create release archive (Windows)
+        if: matrix.os == 'windows'
+        run: |
+          mkdir -p release
+          copy target\${{ matrix.target }}\release\obs-cmd.exe release\
+          tar -czf obs-cmd-${{ matrix.arch }}-${{ matrix.os }}.tar.gz -C release obs-cmd.exe
+          
+      - name: Upload release asset
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: ./obs-cmd-${{ matrix.arch }}-${{ matrix.os }}.tar.gz

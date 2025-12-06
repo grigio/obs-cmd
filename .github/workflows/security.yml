@@ -1,0 +1,180 @@
+name: Security & Quality
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run security audit daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+jobs:
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@stable
+        
+    - name: Cache cargo registry
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-
+          
+    - name: Install security tools
+      run: |
+        cargo install cargo-audit --quiet
+        cargo install cargo-deny --quiet
+        cargo install cargo-outdated --quiet
+      
+    - name: Run security audit
+      run: cargo audit
+      
+    - name: Run cargo-deny check
+      run: cargo deny check
+      
+    - name: Check for outdated dependencies
+      run: cargo outdated --exit-code 1
+
+  code-quality:
+    name: Code Quality Checks
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        components: rustfmt, clippy
+        
+    - name: Cache cargo registry
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-
+          
+    - name: Check code formatting
+      run: cargo fmt --all -- --check
+      
+    - name: Run clippy lints
+      run: cargo clippy --all-targets --all-features -- -D warnings
+      
+    - name: Run tests
+      run: cargo test --all-features
+      
+    - name: Check documentation
+      run: cargo doc --all-features --no-deps --document-private-items
+
+  dependency-analysis:
+    name: Dependency Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@stable
+      
+    - name: Cache cargo registry
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-
+          
+    - name: Install analysis tools
+      run: |
+        cargo install cargo-tree --quiet
+        cargo install cargo-bloat --quiet
+        cargo install cargo-deny --quiet
+          
+    - name: Generate dependency graph
+      run: cargo tree --duplicates --format "{p}"
+        
+    - name: Check for duplicate dependencies
+      run: |
+        duplicates="$(cargo tree --duplicates || true)"
+        if echo "$duplicates" | grep -q "└──"; then
+          echo "Duplicate dependencies found:"
+          echo "$duplicates"
+          # Extract just the package names from duplicates and filter known acceptable ones
+          duplicate_packages="$(echo "$duplicates" | grep -E '^[a-zA-Z0-9_-]+ v[0-9.]+' | cut -d' ' -f1 | sort -u)"
+          echo "Duplicate package names: $duplicate_packages"
+          # Filter out known acceptable duplicates for CLI tools
+          unexpected_duplicates="$(echo "$duplicate_packages" | grep -vE 'hashbrown|itertools|smallvec|unicode-width|tokio|serde|syn|quote|proc-macro2|indexmap|cfg-expr|parking_lot|log|tracing|futures|bytes|bitflags' || true)"
+          if [ -n "$unexpected_duplicates" ]; then
+            echo "Unexpected duplicate dependencies found: $unexpected_duplicates"
+            exit 1
+          else
+            echo "Only known acceptable duplicates found - continuing"
+          fi
+        else
+          echo "No duplicate dependencies found"
+        fi
+        
+    - name: Check dependency sizes
+      run: cargo bloat --crates --release
+
+    - name: Check licenses
+      run: cargo deny check licenses
+
+  secrets-scan:
+    name: Secrets Scan
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch full history for secret scanning
+
+    # For push events: use previous/latest commit
+    - name: Run TruffleHog OSS (push)
+      if: github.event_name == 'push'
+      uses: trufflesecurity/trufflehog@main
+      with:
+        path: ./
+        base: ${{ github.event.before }}
+        head: ${{ github.sha }}
+        extra_args: --debug --only-verified
+
+    # For pull requests: use PR base/head
+    - name: Run TruffleHog OSS (pull_request)
+      if: github.event_name == 'pull_request'
+      uses: trufflesecurity/trufflehog@main
+      with:
+        path: ./
+        base: ${{ github.event.pull_request.base.sha }}
+        head: ${{ github.event.pull_request.head.sha }}
+        extra_args: --debug --only-verified
+
+    # For scheduled/manual runs, scan whole repo
+    - name: Run TruffleHog OSS (schedule/others)
+      if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || github.event_name == 'repository_dispatch'
+      uses: trufflesecurity/trufflehog@main
+      with:
+        path: ./
+        extra_args: --debug --only-verified

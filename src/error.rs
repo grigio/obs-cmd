@@ -28,6 +28,9 @@ pub enum ObsCmdError {
     #[error("Invalid scene item command '{command}'. Valid commands are: enable, disable, toggle")]
     InvalidSceneItemCommand { command: String },
 
+    #[error("Invalid blend mode '{blend_mode}'. Valid modes are: normal, additive, subtract, screen, multiply, lighten, darken")]
+    InvalidBlendMode { blend_mode: String },
+
     #[error("Monitor index {index} is not available. Check available monitors with OBS")]
     MonitorNotAvailable { index: u32 },
 

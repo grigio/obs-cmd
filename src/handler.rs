@@ -72,14 +72,8 @@ pub async fn handle_commands(client: &Client, commands: &Commands) -> Result<()>
             source: source.clone(),
             filter: filter.clone(),
         }),
-        Commands::SceneItem {
-            command,
-            scene,
-            source,
-        } => Box::new(SceneItemHandler {
-            command: command.clone(),
-            scene: scene.clone(),
-            source: source.clone(),
+        Commands::SceneItem(action) => Box::new(SceneItemHandler {
+            action: action.clone(),
         }),
         Commands::TriggerHotkey { name } => Box::new(HotkeyHandler { name: name.clone() }),
         Commands::FullscreenProjector { monitor_index } => Box::new(FullscreenProjectorHandler {

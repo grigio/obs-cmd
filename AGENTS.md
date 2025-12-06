@@ -6,13 +6,13 @@ Keep AGENTS.md updated with non-trivial project design for developers, keep it m
 
 ## Technology Stack
 - **Rust 2021 Edition**: Command-line tool for OBS Studio control
-- **obws**: OBS WebSocket client library
+- **obws**: OBS WebSocket client library. https://docs.rs/obws/latest/obws/ 
 - **clap**: Command-line argument parsing with derive macros
 - **tokio**: Async runtime with multi-threaded scheduler
 - **thiserror**: Error handling with derive macros
 - **async-trait**: Async trait support for command handlers
 - **serde_json**: JSON serialization for stream service settings
-- The official obs-websocket spec https://raw.githubusercontent.com/obsproject/obs-websocket/master/docs/generated/protocol.md
+- The obs-websocket spec obs-websocket-v5.spec.md
 
 ## Project Structure
 ```

@@ -181,6 +181,104 @@ pub enum RecordDirectory {
     Set { directory: String },
 }
 
+#[derive(Subcommand, Clone, Debug)]
+pub enum SceneItem {
+    /// List all scene items in a scene
+    List { scene: String },
+    /// Create a new scene item from a source
+    Create {
+        scene: String,
+        source: String,
+        #[clap(long)]
+        enabled: Option<bool>,
+    },
+    /// Remove a scene item from a scene
+    Remove {
+        scene: String,
+        source: String,
+    },
+    /// Duplicate a scene item in a scene
+    Duplicate {
+        scene: String,
+        source: String,
+    },
+    /// Enable or disable a scene item
+    Enable {
+        scene: String,
+        source: String,
+    },
+    /// Disable a scene item
+    Disable {
+        scene: String,
+        source: String,
+    },
+    /// Toggle a scene item's enabled state
+    Toggle {
+        scene: String,
+        source: String,
+    },
+    /// Lock a scene item
+    Lock {
+        scene: String,
+        source: String,
+    },
+    /// Unlock a scene item
+    Unlock {
+        scene: String,
+        source: String,
+    },
+    /// Get transform info of a scene item
+    GetTransform {
+        scene: String,
+        source: String,
+    },
+    /// Set transform info of a scene item
+    SetTransform {
+        scene: String,
+        source: String,
+        #[clap(long)]
+        position_x: Option<f64>,
+        #[clap(long)]
+        position_y: Option<f64>,
+        #[clap(long)]
+        scale_x: Option<f64>,
+        #[clap(long)]
+        scale_y: Option<f64>,
+        #[clap(long)]
+        rotation: Option<f64>,
+        #[clap(long)]
+        crop_left: Option<u32>,
+        #[clap(long)]
+        crop_right: Option<u32>,
+        #[clap(long)]
+        crop_top: Option<u32>,
+        #[clap(long)]
+        crop_bottom: Option<u32>,
+    },
+    /// Get the index position of a scene item
+    GetIndex {
+        scene: String,
+        source: String,
+    },
+    /// Set the index position of a scene item
+    SetIndex {
+        scene: String,
+        source: String,
+        index: u32,
+    },
+    /// Get the blend mode of a scene item
+    GetBlendMode {
+        scene: String,
+        source: String,
+    },
+    /// Set the blend mode of a scene item
+    SetBlendMode {
+        scene: String,
+        source: String,
+        blend_mode: String,
+    },
+}
+
 /// Command-line interface for obs-cmd.
 ///
 /// This struct defines the main CLI interface using clap for parsing.
@@ -277,11 +375,8 @@ pub enum Commands {
         filter: String,
     },
 
-    SceneItem {
-        command: String,
-        scene: String,
-        source: String,
-    },
+    #[clap(subcommand)]
+    SceneItem(SceneItem),
 
     TriggerHotkey {
         name: String,

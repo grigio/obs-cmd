@@ -400,9 +400,7 @@ pub async fn handle_commands(
             use obws::requests::ui::OpenVideoMixProjector;
             use obws::requests::ui::VideoMixType::Program as OpenVideoMixProjectorType;
             println!("Open fullscreen projector");
-            let monitor_list_res = client.ui().list_monitors().await;
-            if monitor_list_res.is_ok() {
-                let monitor_list = monitor_list_res.unwrap();
+            if let Ok(monitor_list) = client.ui().list_monitors().await {
                 if monitor_list.len() > (*monitor_index as usize) {
                     let res = client
                         .ui()
@@ -428,9 +426,7 @@ pub async fn handle_commands(
             use obws::requests::ui::Location::MonitorIndex as MonitorLocationIndex;
             use obws::requests::ui::OpenSourceProjector;
             println!("Open source projector");
-            let monitor_list_res = client.ui().list_monitors().await;
-            if monitor_list_res.is_ok() {
-                let monitor_list = monitor_list_res.unwrap();
+            if let Ok(monitor_list) = client.ui().list_monitors().await {
                 if monitor_list.len() > (*monitor_index as usize) {
                     let res = client
                         .ui()

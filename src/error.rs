@@ -25,8 +25,7 @@ pub enum ObsCmdError {
     #[error("Invalid filter command '{command}'. Valid commands are: enable, disable, toggle")]
     InvalidFilterCommand { command: String },
 
-    #[error("Invalid scene item command '{command}'. Valid commands are: enable, disable, toggle")]
-    InvalidSceneItemCommand { command: String },
+
 
     #[error("Invalid blend mode '{blend_mode}'. Valid modes are: normal, additive, subtract, screen, multiply, lighten, darken")]
     InvalidBlendMode { blend_mode: String },

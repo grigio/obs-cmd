@@ -1,4 +1,4 @@
-use crate::cli::{Profile, VideoSettings, StreamService, RecordDirectory};
+use crate::cli::{Profile, RecordDirectory, StreamService, VideoSettings};
 use crate::error::Result;
 use crate::handlers::CommandHandler;
 use obws::Client;
@@ -89,9 +89,18 @@ impl CommandHandler for VideoSettingsHandler {
                     .await
                     .map_err(|e| crate::error::ObsCmdError::ConnectionError(e))?;
                 println!("Video Settings:");
-                println!("  Base Resolution: {}x{}", settings.base_width, settings.base_height);
-                println!("  Output Resolution: {}x{}", settings.output_width, settings.output_height);
-                println!("  FPS: {}/{}", settings.fps_numerator, settings.fps_denominator);
+                println!(
+                    "  Base Resolution: {}x{}",
+                    settings.base_width, settings.base_height
+                );
+                println!(
+                    "  Output Resolution: {}x{}",
+                    settings.output_width, settings.output_height
+                );
+                println!(
+                    "  FPS: {}/{}",
+                    settings.fps_numerator, settings.fps_denominator
+                );
             }
             VideoSettings::Set {
                 base_width,
@@ -102,24 +111,24 @@ impl CommandHandler for VideoSettingsHandler {
                 fps_den,
             } => {
                 use obws::requests::config::SetVideoSettings;
-                
+
                 let mut settings = SetVideoSettings::default();
-                
+
                 if let (Some(width), Some(height)) = (base_width, base_height) {
                     settings.base_width = Some(*width);
                     settings.base_height = Some(*height);
                 }
-                
+
                 if let (Some(width), Some(height)) = (output_width, output_height) {
                     settings.output_width = Some(*width);
                     settings.output_height = Some(*height);
                 }
-                
+
                 if let (Some(num), Some(den)) = (fps_num, fps_den) {
                     settings.fps_numerator = Some(*num);
                     settings.fps_denominator = Some(*den);
                 }
-                
+
                 println!("Updating video settings...");
                 client
                     .config()
@@ -170,17 +179,17 @@ impl CommandHandler for StreamServiceHandler {
                 key,
             } => {
                 use serde_json::json;
-                
+
                 let mut settings = json!({});
-                
+
                 if let Some(srv) = server {
                     settings["server"] = json!(srv);
                 }
-                
+
                 if let Some(k) = key {
                     settings["key"] = json!(k);
                 }
-                
+
                 println!("Updating stream service settings...");
                 client
                     .config()

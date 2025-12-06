@@ -6,7 +6,7 @@ mod error;
 mod handler;
 mod handlers;
 
-use clap::Parser;
+use clap::{CommandFactory, Parser};
 use cli::{Cli, ObsWebsocket};
 use connection::{connect_with_retry, ConnectionConfig};
 use error::{ObsCmdError, Result};
@@ -16,6 +16,13 @@ use handler::handle_commands;
 #[allow(clippy::result_large_err)]
 async fn main() -> Result<()> {
     let cli = Cli::parse();
+
+    // Handle completion command separately since it doesn't need OBS connection
+    if let cli::Commands::Completion { shell } = cli.command {
+        let mut cmd = Cli::command();
+        clap_complete::generate(shell, &mut cmd, "obs-cmd", &mut std::io::stdout());
+        return Ok(());
+    }
 
     let config = ConnectionConfig::default();
 

@@ -2,9 +2,9 @@ use crate::cli::Commands;
 use crate::connection::check_connection_health;
 use crate::error::Result;
 use crate::handlers::{
-    audio::AudioHandler, config::ProfileHandler, config::VideoSettingsHandler, 
-    config::StreamServiceHandler, config::RecordDirectoryHandler, filters::FilterHandler, 
-    general::HotkeyHandler, general::InfoHandler, media::MediaInputHandler, 
+    audio::AudioHandler, config::ProfileHandler, config::RecordDirectoryHandler,
+    config::StreamServiceHandler, config::VideoSettingsHandler, filters::FilterHandler,
+    general::HotkeyHandler, general::InfoHandler, media::MediaInputHandler,
     recording::RecordingHandler, replay_buffer::ReplayBufferHandler,
     scene_collections::SceneCollectionHandler, scene_items::SceneItemHandler, scenes::SceneHandler,
     sources::SourceHandler, streaming::StreamingHandler, ui::FullscreenProjectorHandler,
@@ -101,6 +101,10 @@ pub async fn handle_commands(client: &Client, commands: &Commands) -> Result<()>
             height: *height,
             compression_quality: *compression_quality,
         }),
+        Commands::Completion { .. } => {
+            // This should never reach here as completion is handled in main()
+            panic!("Completion command should be handled in main()");
+        }
     };
 
     println!("Executing: {}", handler.description());

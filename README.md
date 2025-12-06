@@ -18,6 +18,7 @@
 - **Hotkeys**: Trigger any OBS hotkey by name
 - **Projectors**: Open fullscreen and source-specific projectors on multiple monitors
 - **System Info**: Get OBS Studio version and connection information
+- **Shell Completion**: Auto-completion support for bash, zsh, fish, and other shells
 
 ## Installation
 
@@ -224,10 +225,30 @@ obs-cmd trigger-hotkey "libobs.unmute"
 obs-cmd info
 ```
 
-For a complete list of commands and options, run:
+#### Shell Completion
+`obs-cmd` supports auto-completion for major shells. Generate completion scripts:
+
 ```bash
-obs-cmd --help
-obs-cmd <command> --help
+# Bash completion
+obs-cmd completion bash > ~/.local/share/bash-completion/completions/obs-cmd
+source ~/.local/share/bash-completion/completions/obs-cmd
+
+# Zsh completion
+obs-cmd completion zsh > ~/.zsh/completions/_obs-cmd
+echo 'fpath+=~/.zsh/completions' >> ~/.zshrc
+autoload -U compinit && compinit
+
+# Fish completion
+obs-cmd completion fish > ~/.config/fish/completions/obs-cmd.fish
+
+# PowerShell completion
+obs-cmd completion powershell | Out-File -Encoding utf8 $PROFILE
+```
+
+After setting up completion, you can use `Tab` to auto-complete commands:
+```bash
+obs-cmd rec<Tab>        # Completes to "recording"
+obs-cmd scene sw<Tab>   # Completes to "scene switch"
 ```
 
 ### Integration Examples

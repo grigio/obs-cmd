@@ -1,14 +1,14 @@
 use crate::cli::SceneItem;
 use crate::error::{ObsCmdError, Result};
 use crate::handlers::CommandHandler;
+use obws::common::BlendMode;
 use obws::requests::scene_items::{
-    CreateSceneItem, Duplicate, Id as IdItem, SetBlendMode, SetEnabled as SetEnabledItem,
-    SetIndex, SetLocked, SetTransform, SceneItemTransform, Position, Scale, Crop,
+    CreateSceneItem, Crop, Duplicate, Id as IdItem, Position, Scale, SceneItemTransform,
+    SetBlendMode, SetEnabled as SetEnabledItem, SetIndex, SetLocked, SetTransform,
 };
 use obws::requests::scenes::SceneId;
 use obws::requests::sources::SourceId;
 use obws::Client;
-use obws::common::BlendMode;
 
 /// Handler for scene item commands
 pub struct SceneItemHandler {
@@ -30,9 +30,7 @@ impl CommandHandler for SceneItemHandler {
                 for item in items {
                     println!(
                         "  - ID: {}, Source: '{}', Index: {}",
-                        item.id,
-                        item.source_name,
-                        item.index
+                        item.id, item.source_name, item.index
                     );
                 }
             }
@@ -64,10 +62,7 @@ impl CommandHandler for SceneItemHandler {
                     .await
                     .map_err(|e| ObsCmdError::ConnectionError(e))?;
 
-                println!(
-                    "Removed scene item '{}' from scene '{}'",
-                    source, scene
-                );
+                println!("Removed scene item '{}' from scene '{}'", source, scene);
             }
             SceneItem::Duplicate { scene, source } => {
                 let item_id = get_scene_item_id(client, scene, source).await?;
@@ -102,7 +97,7 @@ impl CommandHandler for SceneItemHandler {
                     .await
                     .map_err(|e| ObsCmdError::ConnectionError(e))?;
                 let new_state = !current_state;
-                
+
                 set_scene_item_enabled(client, scene, source, new_state).await?;
                 println!(
                     "Scene item '{}' in scene '{}': {}",
@@ -127,13 +122,25 @@ impl CommandHandler for SceneItemHandler {
                     .await
                     .map_err(|e| ObsCmdError::ConnectionError(e))?;
 
-                println!("Transform for scene item '{}' in scene '{}':", source, scene);
-                println!("  Position: X: {}, Y: {}", transform.position_x, transform.position_y);
-                println!("  Scale: X: {}, Y: {}", transform.scale_x, transform.scale_y);
+                println!(
+                    "Transform for scene item '{}' in scene '{}':",
+                    source, scene
+                );
+                println!(
+                    "  Position: X: {}, Y: {}",
+                    transform.position_x, transform.position_y
+                );
+                println!(
+                    "  Scale: X: {}, Y: {}",
+                    transform.scale_x, transform.scale_y
+                );
                 println!("  Rotation: {} degrees", transform.rotation);
                 println!(
                     "  Crop: Left: {}, Right: {}, Top: {}, Bottom: {}",
-                    transform.crop_left, transform.crop_right, transform.crop_top, transform.crop_bottom
+                    transform.crop_left,
+                    transform.crop_right,
+                    transform.crop_top,
+                    transform.crop_bottom
                 );
             }
             SceneItem::SetTransform {
@@ -150,7 +157,7 @@ impl CommandHandler for SceneItemHandler {
                 crop_bottom,
             } => {
                 let item_id = get_scene_item_id(client, scene, source).await?;
-                
+
                 // Get current transform to use as base
                 let _current_transform = client
                     .scene_items()
@@ -176,7 +183,11 @@ impl CommandHandler for SceneItemHandler {
                         None
                     },
                     rotation: rotation.map(|r| r as f32),
-                    crop: if crop_left.is_some() || crop_right.is_some() || crop_top.is_some() || crop_bottom.is_some() {
+                    crop: if crop_left.is_some()
+                        || crop_right.is_some()
+                        || crop_top.is_some()
+                        || crop_bottom.is_some()
+                    {
                         Some(Crop {
                             left: *crop_left,
                             right: *crop_right,
@@ -187,7 +198,7 @@ impl CommandHandler for SceneItemHandler {
                         None
                     },
                     alignment: None, // Keep current alignment
-                    bounds: None, // Keep current bounds
+                    bounds: None,    // Keep current bounds
                 };
 
                 client
@@ -200,7 +211,10 @@ impl CommandHandler for SceneItemHandler {
                     .await
                     .map_err(|e| ObsCmdError::ConnectionError(e))?;
 
-                println!("Updated transform for scene item '{}' in scene '{}'", source, scene);
+                println!(
+                    "Updated transform for scene item '{}' in scene '{}'",
+                    source, scene
+                );
             }
             SceneItem::GetIndex { scene, source } => {
                 let item_id = get_scene_item_id(client, scene, source).await?;
@@ -215,7 +229,11 @@ impl CommandHandler for SceneItemHandler {
                     source, scene, index
                 );
             }
-            SceneItem::SetIndex { scene, source, index } => {
+            SceneItem::SetIndex {
+                scene,
+                source,
+                index,
+            } => {
                 let item_id = get_scene_item_id(client, scene, source).await?;
                 client
                     .scene_items()
@@ -245,10 +263,14 @@ impl CommandHandler for SceneItemHandler {
                     source, scene, blend_mode
                 );
             }
-            SceneItem::SetBlendMode { scene, source, blend_mode } => {
+            SceneItem::SetBlendMode {
+                scene,
+                source,
+                blend_mode,
+            } => {
                 let item_id = get_scene_item_id(client, scene, source).await?;
                 let parsed_blend_mode = parse_blend_mode(blend_mode)?;
-                
+
                 client
                     .scene_items()
                     .set_blend_mode(SetBlendMode {
@@ -264,7 +286,6 @@ impl CommandHandler for SceneItemHandler {
                     source, scene, parsed_blend_mode
                 );
             }
-
         }
 
         Ok(())
@@ -305,7 +326,12 @@ async fn get_scene_item_id(client: &Client, scene: &str, source: &str) -> Result
 }
 
 /// Helper function to set scene item enabled state
-async fn set_scene_item_enabled(client: &Client, scene: &str, source: &str, enabled: bool) -> Result<()> {
+async fn set_scene_item_enabled(
+    client: &Client,
+    scene: &str,
+    source: &str,
+    enabled: bool,
+) -> Result<()> {
     let item_id = get_scene_item_id(client, scene, source).await?;
     client
         .scene_items()
@@ -319,7 +345,12 @@ async fn set_scene_item_enabled(client: &Client, scene: &str, source: &str, enab
 }
 
 /// Helper function to set scene item locked state
-async fn set_scene_item_locked(client: &Client, scene: &str, source: &str, locked: bool) -> Result<()> {
+async fn set_scene_item_locked(
+    client: &Client,
+    scene: &str,
+    source: &str,
+    locked: bool,
+) -> Result<()> {
     let item_id = get_scene_item_id(client, scene, source).await?;
     client
         .scene_items()

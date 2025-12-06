@@ -60,11 +60,17 @@ impl CommandHandler for SceneHandler {
                     .map_err(|e| crate::error::ObsCmdError::ConnectionError(e))?;
                 println!("Scene removed successfully");
             }
-            Scene::Rename { scene_name, new_name } => {
+            Scene::Rename {
+                scene_name,
+                new_name,
+            } => {
                 println!("Renaming scene '{}' to '{}'", scene_name, new_name);
                 client
                     .scenes()
-                    .set_name(obws::requests::scenes::SceneId::Name(scene_name.as_str()), new_name.as_str())
+                    .set_name(
+                        obws::requests::scenes::SceneId::Name(scene_name.as_str()),
+                        new_name.as_str(),
+                    )
                     .await
                     .map_err(|e| crate::error::ObsCmdError::ConnectionError(e))?;
                 println!("Scene renamed successfully");
@@ -129,7 +135,14 @@ impl CommandHandler for SceneHandler {
                     .studio_mode_enabled()
                     .await
                     .map_err(|e| crate::error::ObsCmdError::ConnectionError(e))?;
-                println!("Studio mode: {}", if studio_mode_enabled { "enabled" } else { "disabled" });
+                println!(
+                    "Studio mode: {}",
+                    if studio_mode_enabled {
+                        "enabled"
+                    } else {
+                        "disabled"
+                    }
+                );
             }
             Scene::StudioModeEnable => {
                 println!("Enabling studio mode");
@@ -161,7 +174,10 @@ impl CommandHandler for SceneHandler {
                     .set_studio_mode_enabled(!current)
                     .await
                     .map_err(|e| crate::error::ObsCmdError::ConnectionError(e))?;
-                println!("Studio mode toggled to: {}", if !current { "enabled" } else { "disabled" });
+                println!(
+                    "Studio mode toggled to: {}",
+                    if !current { "enabled" } else { "disabled" }
+                );
             }
             Scene::StudioModeTransition => {
                 println!("Triggering studio mode transition");

@@ -104,16 +104,29 @@ pub enum Recording {
 #[derive(Subcommand, Clone, Debug)]
 pub enum Scene {
     Current,
-    Switch { scene_name: String },
+    Switch {
+        scene_name: String,
+    },
     List,
-    Create { scene_name: String },
-    Remove { scene_name: String },
-    Rename { scene_name: String, new_name: String },
+    Create {
+        scene_name: String,
+    },
+    Remove {
+        scene_name: String,
+    },
+    Rename {
+        scene_name: String,
+        new_name: String,
+    },
     // Transition controls
     TransitionList,
     TransitionCurrent,
-    TransitionSet { transition_name: String },
-    TransitionDuration { duration_ms: u64 },
+    TransitionSet {
+        transition_name: String,
+    },
+    TransitionDuration {
+        duration_ms: u64,
+    },
     TransitionTrigger,
     // Studio mode controls
     StudioModeStatus,
@@ -123,7 +136,9 @@ pub enum Scene {
     StudioModeTransition,
     // Preview scene controls (studio mode only)
     PreviewCurrent,
-    PreviewSet { scene_name: String },
+    PreviewSet {
+        scene_name: String,
+    },
 }
 
 #[derive(Subcommand, Clone, Debug)]
@@ -193,45 +208,21 @@ pub enum SceneItem {
         enabled: Option<bool>,
     },
     /// Remove a scene item from a scene
-    Remove {
-        scene: String,
-        source: String,
-    },
+    Remove { scene: String, source: String },
     /// Duplicate a scene item in a scene
-    Duplicate {
-        scene: String,
-        source: String,
-    },
+    Duplicate { scene: String, source: String },
     /// Enable or disable a scene item
-    Enable {
-        scene: String,
-        source: String,
-    },
+    Enable { scene: String, source: String },
     /// Disable a scene item
-    Disable {
-        scene: String,
-        source: String,
-    },
+    Disable { scene: String, source: String },
     /// Toggle a scene item's enabled state
-    Toggle {
-        scene: String,
-        source: String,
-    },
+    Toggle { scene: String, source: String },
     /// Lock a scene item
-    Lock {
-        scene: String,
-        source: String,
-    },
+    Lock { scene: String, source: String },
     /// Unlock a scene item
-    Unlock {
-        scene: String,
-        source: String,
-    },
+    Unlock { scene: String, source: String },
     /// Get transform info of a scene item
-    GetTransform {
-        scene: String,
-        source: String,
-    },
+    GetTransform { scene: String, source: String },
     /// Set transform info of a scene item
     SetTransform {
         scene: String,
@@ -256,10 +247,7 @@ pub enum SceneItem {
         crop_bottom: Option<u32>,
     },
     /// Get the index position of a scene item
-    GetIndex {
-        scene: String,
-        source: String,
-    },
+    GetIndex { scene: String, source: String },
     /// Set the index position of a scene item
     SetIndex {
         scene: String,
@@ -267,10 +255,7 @@ pub enum SceneItem {
         index: u32,
     },
     /// Get the blend mode of a scene item
-    GetBlendMode {
-        scene: String,
-        source: String,
-    },
+    GetBlendMode { scene: String, source: String },
     /// Set the blend mode of a scene item
     SetBlendMode {
         scene: String,
@@ -394,6 +379,13 @@ pub enum Commands {
     },
     #[clap(subcommand)]
     MediaInput(MediaInput),
+
+    /// Generate shell completion scripts
+    Completion {
+        /// Shell type to generate completion for
+        #[arg(value_enum)]
+        shell: clap_complete::Shell,
+    },
 }
 
 #[derive(Subcommand, Clone, Debug)]

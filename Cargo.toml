@@ -11,9 +11,9 @@ license = "MIT"
 name = "obs-cmd"
 
 [dependencies]
-tokio = { version = "1.48.0", features = ["rt-multi-thread", "macros", "time"] }
-obws = "0.14.0"
-clap = { version = "4.5.53", features = ["derive"] }
-url = "2.5.4"
-time = "0.3.41"
-thiserror = "2.0.17"
+tokio = { version = "1.5", features = ["rt-multi-thread", "macros", "time"] }
+obws = "0.14"
+clap = { version = "4.5", features = ["derive"] }
+url = "2.5"
+time = "0.3.5"
+thiserror = "2.0"

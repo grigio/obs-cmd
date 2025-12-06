@@ -7,14 +7,17 @@
 
 ## Features
 
-- **Scene Management**: Switch between scenes and scene collections.
-- **Recording & Streaming**: Start, stop, and toggle recording and streaming.
-- **Source Control**: Toggle filters, mute audio sources, and manage scene items.
-- **Camera Control**: Start and stop the virtual camera.
-- **Replay Buffer**: Manage the replay buffer, including saving replays.
-- **Hotkeys**: Trigger OBS hotkeys by name.
-- **Projectors**: Open fullscreen and source projectors.
-- **Media Inputs**: Control media playback, including play, pause, and restart.
+- **Scene Management**: Switch between scenes, get current scene, manage scene collections
+- **Recording Control**: Start, stop, pause, resume recording with status monitoring
+- **Streaming Control**: Start, stop, toggle streaming with status checking
+- **Source Control**: Toggle filters, mute/unmute audio sources, show/hide scene items
+- **Virtual Camera**: Start, stop, toggle virtual camera output
+- **Replay Buffer**: Manage replay buffer with save functionality and status tracking
+- **Media Inputs**: Full media control with play, pause, stop, restart, and seek capabilities
+- **Screenshots**: Capture source screenshots with custom dimensions and compression
+- **Hotkeys**: Trigger any OBS hotkey by name
+- **Projectors**: Open fullscreen and source-specific projectors on multiple monitors
+- **System Info**: Get OBS Studio version and connection information
 
 ## Installation
 
@@ -24,8 +27,8 @@ You can download the latest pre-compiled binaries for your operating system from
 
 **Linux/macOS:**
 ```bash
-# Download the appropriate binary for your system
-curl -L https://github.com/grigio/obs-cmd/releases/latest/download/obs-cmd-linux-amd64 -o obs-cmd
+# Download and extract the appropriate binary for your system
+curl -L https://github.com/grigio/obs-cmd/releases/latest/download/obs-cmd-x64-linux.tar.gz | tar xz
 chmod +x obs-cmd
 sudo mv obs-cmd /usr/local/bin/
 ```
@@ -71,28 +74,191 @@ export OBS_WEBSOCKET_URL=obsws://<hostname>:<port>/<password>
 obs-cmd <command>
 ```
 
-### Examples
+### Commands Reference
 
+#### Scene Management
 ```bash
-# Switch to a scene named "Live"
-obs-cmd scene switch Live
+# Get current scene
+obs-cmd scene current
 
-# Start recording
+# Switch to a scene
+obs-cmd scene switch "Scene Name"
+
+# Switch scene collection
+obs-cmd scene-collection switch "Collection Name"
+```
+
+#### Recording Control
+```bash
+# Start/stop/toggle recording
 obs-cmd recording start
+obs-cmd recording stop
+obs-cmd recording toggle
 
-# Toggle the mute state of an audio source
+# Pause/resume recording
+obs-cmd recording pause
+obs-cmd recording resume
+obs-cmd recording toggle-pause
+
+# Check recording status
+obs-cmd recording status
+obs-cmd recording status-active
+```
+
+#### Streaming Control
+```bash
+# Start/stop/toggle streaming
+obs-cmd streaming start
+obs-cmd streaming stop
+obs-cmd streaming toggle
+
+# Check streaming status
+obs-cmd streaming status
+```
+
+#### Virtual Camera
+```bash
+# Start/stop/toggle virtual camera
+obs-cmd virtual-camera start
+obs-cmd virtual-camera stop
+obs-cmd virtual-camera toggle
+```
+
+#### Replay Buffer
+```bash
+# Start/stop/toggle replay buffer
+obs-cmd replay start
+obs-cmd replay stop
+obs-cmd replay toggle
+
+# Save last replay
+obs-cmd replay save
+
+# Get last replay path
+obs-cmd replay last-replay
+
+# Check replay buffer status
+obs-cmd replay status
+```
+
+#### Audio Control
+```bash
+# Toggle mute state
 obs-cmd audio toggle "Mic/Aux"
 
-# Save a screenshot of a source
-obs-cmd save-screenshot "Webcam" "png" "/path/to/screenshot.png"
+# Mute/unmute audio devices
+obs-cmd audio mute "Desktop Audio"
+obs-cmd audio unmute "Mic/Aux"
+
+# Check audio device status
+obs-cmd audio status "Mic/Aux"
 ```
 
-For a full list of commands and options, run:
+#### Filter Management
+```bash
+# Enable/disable filter
+obs-cmd filter enable "Source Name" "Filter Name"
+obs-cmd filter disable "Source Name" "Filter Name"
+obs-cmd filter toggle "Source Name" "Filter Name"
+```
+
+#### Scene Items
+```bash
+# Enable/disable scene items (show/hide)
+obs-cmd scene-item enable "Scene Name" "Source Name"
+obs-cmd scene-item disable "Scene Name" "Source Name"
+obs-cmd scene-item toggle "Scene Name" "Source Name"
+```
+
+#### Media Input Control
+```bash
+# Play/pause/stop/restart media
+obs-cmd media-input play "Media Source"
+obs-cmd media-input pause "Media Source"
+obs-cmd media-input stop "Media Source"
+obs-cmd media-input restart "Media Source"
+
+# Set cursor position (format: [hh:]mm:ss)
+obs-cmd media-input set-cursor "Media Source" "00:30"
+obs-cmd media-input set-cursor "Media Source" "1:23:45"
+```
+
+#### Screenshots
+```bash
+# Save source screenshot
+obs-cmd save-screenshot "Webcam" "png" "/path/to/screenshot.png"
+
+# With custom dimensions
+obs-cmd save-screenshot "Display Capture" "jpg" "/path/to/screenshot.jpg" --width 1920 --height 1080
+
+# With compression quality (for JPEG)
+obs-cmd save-screenshot "Source" "jpg" "/path/to/screenshot.jpg" --compression-quality 90
+```
+
+#### Projectors
+```bash
+# Open fullscreen projector on specific monitor
+obs-cmd fullscreen-projector --monitor-index 1
+
+# Open source projector on specific monitor
+obs-cmd source-projector "Webcam" --monitor-index 2
+```
+
+#### Hotkeys
+```bash
+# Trigger hotkey by name (check OBS Settings → Hotkeys for exact names)
+obs-cmd trigger-hotkey "OBSBasic.StartRecording"
+obs-cmd trigger-hotkey "OBSBasic.StopRecording"
+
+# Audio mute/unmute hotkeys
+obs-cmd trigger-hotkey "libobs.mute"
+obs-cmd trigger-hotkey "libobs.unmute"
+
+# Note: Hotkey functionality comes as-is and may not be reliable
+# For most operations, use specific commands like 'recording start' instead
+```
+
+#### System Information
+```bash
+# Get OBS Studio version and info
+obs-cmd info
+```
+
+For a complete list of commands and options, run:
 ```bash
 obs-cmd --help
+obs-cmd <command> --help
 ```
 
-On Linux/GNOME you can map `obs-cmd` commands as global shortcuts.
+### Integration Examples
+
+#### Linux/GNOME Shortcuts
+Map `obs-cmd` commands as global keyboard shortcuts in GNOME Settings:
+
+```bash
+# Examples for custom shortcuts:
+# obs-cmd recording start
+# obs-cmd scene switch "Live"
+# obs-cmd streaming toggle
+```
+
+#### Stream Deck Integration
+Use `obs-cmd` with Stream Deck software for one-touch OBS control:
+- Add "System: Open" action
+- Point to obs-cmd executable with desired command
+- Example: `/usr/local/bin/obs-cmd recording toggle`
+
+#### Scripting Examples
+```bash
+# Bash script for stream start sequence
+#!/bin/bash
+obs-cmd scene switch "Starting Soon"
+sleep 5
+obs-cmd streaming start
+sleep 2
+obs-cmd scene switch "Live"
+
+```
 
 ![Example usage on Linux](./static/shortcuts.png)
 
@@ -100,6 +266,50 @@ On Linux/GNOME you can map `obs-cmd` commands as global shortcuts.
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/obs-cmd.svg)](https://repology.org/project/obs-cmd/versions)
 
+
+## Requirements
+
+- **OBS Studio** 28.0+ with obs-websocket v5 plugin
+- **WebSocket Server** enabled in OBS (Tools → WebSocket Server Settings)
+- Default connection: `obsws://localhost:4455` with password `secret`
+
+## Troubleshooting
+
+### Connection Issues
+```bash
+# Test connection
+obs-cmd info
+
+# Check if OBS WebSocket is running
+# In OBS: Tools → WebSocket Server Settings → Enable WebSocket Server
+```
+
+### Common Errors
+- **Connection refused**: Ensure OBS WebSocket server is running
+- **Authentication failed**: Check password in OBS WebSocket settings
+- **Invalid URL format**: Use `obsws://hostname:port/password` format
+
+### Debug Mode
+Set environment variable for verbose output:
+```bash
+RUST_LOG=debug obs-cmd info
+```
+
+## Development
+
+```bash
+# Build from source
+cargo build --release
+
+# Run tests
+cargo test
+
+# Format code
+cargo fmt
+
+# Lint code
+cargo clippy -- -D warnings
+```
 
 ## Donations
 

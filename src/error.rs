@@ -1,61 +1,62 @@
 use thiserror::Error;
 
+/// Error types for obs-cmd operations.
+/// 
+/// This enum represents all possible errors that can occur during
+/// OBS WebSocket operations, connection handling, and command execution.
+/// Each error variant provides detailed, actionable error messages.
 #[derive(Error, Debug)]
 #[allow(clippy::result_large_err)]
 pub enum ObsCmdError {
-    #[error("WebSocket connection error: {0}")]
+    #[error("WebSocket connection failed: {0}. Ensure OBS is running with WebSocket server enabled")]
     ConnectionError(#[from] obws::error::Error),
 
-    #[error("URL parsing error: {0}")]
+    #[error("Invalid URL format: {0}. Use format: obsws://hostname:port/password")]
     UrlParseError(#[from] url::ParseError),
 
-    #[error("Environment variable error: {0}")]
+    #[error("Environment variable error: {0}. Set OBS_WEBSOCKET_URL environment variable")]
     EnvError(#[from] std::env::VarError),
 
-    #[allow(dead_code)]
-    #[error("Command execution failed: {message}")]
-    CommandError { message: String },
 
-    #[error("Invalid audio command: {command}")]
+
+    #[error("Invalid audio command '{command}'. Valid commands are: mute, unmute, toggle, status")]
     InvalidAudioCommand { command: String },
 
-    #[error("Invalid filter command: {command}")]
+    #[error("Invalid filter command '{command}'. Valid commands are: enable, disable, toggle")]
     InvalidFilterCommand { command: String },
 
-    #[error("Invalid scene item command: {command}")]
+    #[error("Invalid scene item command '{command}'. Valid commands are: enable, disable, toggle")]
     InvalidSceneItemCommand { command: String },
 
-    #[error("Monitor not available: index {index} out of range")]
+    #[error("Monitor index {index} is not available. Check available monitors with OBS")]
     MonitorNotAvailable { index: u32 },
 
-    #[error("No monitor list received from OBS")]
+    #[error("Unable to retrieve monitor list from OBS. Ensure OBS is running and WebSocket is connected")]
     NoMonitorList,
 
-    #[error("Recording is not active")]
+    #[error("Recording is not currently active. Start recording first")]
     RecordingNotActive,
 
-    #[error("Recording is paused")]
+    #[error("Recording is currently paused. Use resume command to continue")]
     RecordingPaused,
 
-    #[error("No last replay found")]
+    #[error("No replay buffer recording found. Start replay buffer first")]
     NoLastReplay,
 
-    #[allow(dead_code)]
-    #[error("OBS operation failed: {0}")]
-    ObsOperationError(String),
 
-    #[allow(dead_code)]
-    #[error("Invalid URL format: {0}")]
-    InvalidUrlFormat(String),
 
-    #[error("Connection timeout after {timeout} seconds")]
+    #[error("Connection timed out after {timeout} seconds. Check OBS is running and WebSocket is enabled")]
     ConnectionTimeout { timeout: u64 },
 
-    #[error("All {attempts} connection attempts failed")]
+    #[error("Failed to connect after {attempts} attempts. Verify OBS WebSocket settings and network connectivity")]
     AllConnectionAttemptsFailed { attempts: u32 },
 
-    #[error("WebSocket URL parsing failed: {0}")]
+    #[error("Invalid WebSocket URL format: {0}. Expected format: obsws://hostname:port/password")]
     WebSocketUrlParseError(String),
 }
 
+/// Result type alias for obs-cmd operations.
+/// 
+/// This is a convenience alias for `std::result::Result<T, ObsCmdError>`
+/// to simplify error handling throughout the application.
 pub type Result<T> = std::result::Result<T, ObsCmdError>;

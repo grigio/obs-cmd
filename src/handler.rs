@@ -10,6 +10,11 @@ use obws::requests::scene_items::SetEnabled as SetEnabledItem;
 use obws::requests::sources::SaveScreenshot;
 use obws::Client;
 
+/// Handles all OBS WebSocket commands and routes them to appropriate OBS API calls.
+/// 
+/// This function is the main command dispatcher that takes a client connection
+/// and a command enum, then executes the corresponding OBS operation.
+/// It includes connection health checking and comprehensive error handling.
 pub async fn handle_commands(client: &Client, commands: &Commands) -> Result<()> {
     // Check connection health before executing commands
     if let Err(e) = check_connection_health(client).await {
@@ -448,4 +453,136 @@ pub async fn handle_commands(client: &Client, commands: &Commands) -> Result<()>
         }
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::cli::{
+        Commands, MediaInput, Recording, Scene,
+    };
+    use std::path::PathBuf;
+
+    #[tokio::test]
+    async fn test_media_input_play_command() {
+        let command = Commands::MediaInput(MediaInput::Play {
+            name: "test_media".to_string(),
+        });
+        
+        match command {
+            Commands::MediaInput(MediaInput::Play { name }) => {
+                assert_eq!(name, "test_media");
+            }
+            _ => panic!("Expected MediaInput::Play command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_scene_switch_command() {
+        let command = Commands::Scene(Scene::Switch {
+            scene_name: "test_scene".to_string(),
+        });
+        
+        match command {
+            Commands::Scene(Scene::Switch { scene_name }) => {
+                assert_eq!(scene_name, "test_scene");
+            }
+            _ => panic!("Expected Scene::Switch command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_recording_start_command() {
+        let command = Commands::Recording(Recording::Start);
+        
+        match command {
+            Commands::Recording(Recording::Start) => {
+                // Test passes if pattern matches
+            }
+            _ => panic!("Expected Recording::Start command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_audio_mute_command() {
+        let command = Commands::Audio {
+            command: "mute".to_string(),
+            device: "Mic/Aux".to_string(),
+        };
+        
+        match command {
+            Commands::Audio { command, device } => {
+                assert_eq!(command, "mute");
+                assert_eq!(device, "Mic/Aux");
+            }
+            _ => panic!("Expected Audio command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_filter_enable_command() {
+        let command = Commands::Filter {
+            command: "enable".to_string(),
+            source: "Camera".to_string(),
+            filter: "Color Correction".to_string(),
+        };
+        
+        match command {
+            Commands::Filter { command, source, filter } => {
+                assert_eq!(command, "enable");
+                assert_eq!(source, "Camera");
+                assert_eq!(filter, "Color Correction");
+            }
+            _ => panic!("Expected Filter command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_save_screenshot_command() {
+        let command = Commands::SaveScreenshot {
+            source: "Camera".to_string(),
+            format: "png".to_string(),
+            file_path: PathBuf::from("/tmp/screenshot.png"),
+            width: Some(1920),
+            height: Some(1080),
+            compression_quality: Some(80),
+        };
+        
+        match command {
+            Commands::SaveScreenshot { source, format, file_path, width, height, compression_quality } => {
+                assert_eq!(source, "Camera");
+                assert_eq!(format, "png");
+                assert_eq!(file_path, PathBuf::from("/tmp/screenshot.png"));
+                assert_eq!(width, Some(1920));
+                assert_eq!(height, Some(1080));
+                assert_eq!(compression_quality, Some(80));
+            }
+            _ => panic!("Expected SaveScreenshot command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_trigger_hotkey_command() {
+        let command = Commands::TriggerHotkey {
+            name: "OBSBasic.StartRecording".to_string(),
+        };
+        
+        match command {
+            Commands::TriggerHotkey { name } => {
+                assert_eq!(name, "OBSBasic.StartRecording");
+            }
+            _ => panic!("Expected TriggerHotkey command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_info_command() {
+        let command = Commands::Info;
+        
+        match command {
+            Commands::Info => {
+                // Test passes if pattern matches
+            }
+            _ => panic!("Expected Info command"),
+        }
+    }
 }

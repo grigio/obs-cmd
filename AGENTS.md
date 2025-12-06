@@ -5,6 +5,7 @@
 - **obws**: OBS WebSocket client library
 - **clap**: Command-line argument parsing
 - **tokio**: Async runtime
+- The official obs-websocket spec https://raw.githubusercontent.com/obsproject/obs-websocket/master/docs/generated/protocol.md
 
 ## Project Structure
 ```

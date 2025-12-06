@@ -4,16 +4,23 @@ version = "0.20.3"
 edition = "2021"
 description = "A minimal command to control obs via obs-websocket"
 authors = ["Luigi Maselli <luigi@grigio.org>"]
-rust-version = "1.88.0"
+
 license = "MIT"
 
 [[bin]]
 name = "obs-cmd"
 
 [dependencies]
-tokio = { version = "1.42", features = ["rt-multi-thread", "macros", "time"] }
+tokio = { version = "1.42", features = ["rt-multi-thread", "macros", "time"], default-features = false }
 obws = "0.14"
 clap = { version = "4.5", features = ["derive"] }
 url = "2.5"
 time = "0.3.37"
 thiserror = "2.0"
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true

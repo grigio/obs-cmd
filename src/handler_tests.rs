@@ -115,6 +115,210 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn test_scene_list_command() {
+        let command = Commands::Scene(Scene::List);
+        
+        match command {
+            Commands::Scene(Scene::List) => {
+                // Test passes if pattern matches
+            }
+            _ => panic!("Expected Scene::List command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_scene_create_command() {
+        let command = Commands::Scene(Scene::Create {
+            scene_name: "new_scene".to_string(),
+        });
+        
+        match command {
+            Commands::Scene(Scene::Create { scene_name }) => {
+                assert_eq!(scene_name, "new_scene");
+            }
+            _ => panic!("Expected Scene::Create command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_scene_remove_command() {
+        let command = Commands::Scene(Scene::Remove {
+            scene_name: "old_scene".to_string(),
+        });
+        
+        match command {
+            Commands::Scene(Scene::Remove { scene_name }) => {
+                assert_eq!(scene_name, "old_scene");
+            }
+            _ => panic!("Expected Scene::Remove command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_scene_rename_command() {
+        let command = Commands::Scene(Scene::Rename {
+            scene_name: "old_name".to_string(),
+            new_name: "new_name".to_string(),
+        });
+        
+        match command {
+            Commands::Scene(Scene::Rename { scene_name, new_name }) => {
+                assert_eq!(scene_name, "old_name");
+                assert_eq!(new_name, "new_name");
+            }
+            _ => panic!("Expected Scene::Rename command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_scene_transition_list_command() {
+        let command = Commands::Scene(Scene::TransitionList);
+        
+        match command {
+            Commands::Scene(Scene::TransitionList) => {
+                // Test passes if pattern matches
+            }
+            _ => panic!("Expected Scene::TransitionList command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_scene_transition_current_command() {
+        let command = Commands::Scene(Scene::TransitionCurrent);
+        
+        match command {
+            Commands::Scene(Scene::TransitionCurrent) => {
+                // Test passes if pattern matches
+            }
+            _ => panic!("Expected Scene::TransitionCurrent command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_scene_transition_set_command() {
+        let command = Commands::Scene(Scene::TransitionSet {
+            transition_name: "Fade".to_string(),
+        });
+        
+        match command {
+            Commands::Scene(Scene::TransitionSet { transition_name }) => {
+                assert_eq!(transition_name, "Fade");
+            }
+            _ => panic!("Expected Scene::TransitionSet command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_scene_transition_duration_command() {
+        let command = Commands::Scene(Scene::TransitionDuration { duration_ms: 500 });
+        
+        match command {
+            Commands::Scene(Scene::TransitionDuration { duration_ms }) => {
+                assert_eq!(duration_ms, 500);
+            }
+            _ => panic!("Expected Scene::TransitionDuration command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_scene_transition_trigger_command() {
+        let command = Commands::Scene(Scene::TransitionTrigger);
+        
+        match command {
+            Commands::Scene(Scene::TransitionTrigger) => {
+                // Test passes if pattern matches
+            }
+            _ => panic!("Expected Scene::TransitionTrigger command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_scene_studio_mode_status_command() {
+        let command = Commands::Scene(Scene::StudioModeStatus);
+        
+        match command {
+            Commands::Scene(Scene::StudioModeStatus) => {
+                // Test passes if pattern matches
+            }
+            _ => panic!("Expected Scene::StudioModeStatus command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_scene_studio_mode_enable_command() {
+        let command = Commands::Scene(Scene::StudioModeEnable);
+        
+        match command {
+            Commands::Scene(Scene::StudioModeEnable) => {
+                // Test passes if pattern matches
+            }
+            _ => panic!("Expected Scene::StudioModeEnable command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_scene_studio_mode_disable_command() {
+        let command = Commands::Scene(Scene::StudioModeDisable);
+        
+        match command {
+            Commands::Scene(Scene::StudioModeDisable) => {
+                // Test passes if pattern matches
+            }
+            _ => panic!("Expected Scene::StudioModeDisable command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_scene_studio_mode_toggle_command() {
+        let command = Commands::Scene(Scene::StudioModeToggle);
+        
+        match command {
+            Commands::Scene(Scene::StudioModeToggle) => {
+                // Test passes if pattern matches
+            }
+            _ => panic!("Expected Scene::StudioModeToggle command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_scene_studio_mode_transition_command() {
+        let command = Commands::Scene(Scene::StudioModeTransition);
+        
+        match command {
+            Commands::Scene(Scene::StudioModeTransition) => {
+                // Test passes if pattern matches
+            }
+            _ => panic!("Expected Scene::StudioModeTransition command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_scene_preview_current_command() {
+        let command = Commands::Scene(Scene::PreviewCurrent);
+        
+        match command {
+            Commands::Scene(Scene::PreviewCurrent) => {
+                // Test passes if pattern matches
+            }
+            _ => panic!("Expected Scene::PreviewCurrent command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_scene_preview_set_command() {
+        let command = Commands::Scene(Scene::PreviewSet {
+            scene_name: "preview_scene".to_string(),
+        });
+        
+        match command {
+            Commands::Scene(Scene::PreviewSet { scene_name }) => {
+                assert_eq!(scene_name, "preview_scene");
+            }
+            _ => panic!("Expected Scene::PreviewSet command"),
+        }
+    }
+
+    #[tokio::test]
     async fn test_recording_start_command() {
         let command = Commands::Recording(Recording::Start);
         

@@ -1,4 +1,5 @@
 pub mod audio;
+pub mod config;
 pub mod filters;
 pub mod general;
 pub mod handler_tests;

@@ -105,12 +105,80 @@ pub enum Recording {
 pub enum Scene {
     Current,
     Switch { scene_name: String },
+    List,
+    Create { scene_name: String },
+    Remove { scene_name: String },
+    Rename { scene_name: String, new_name: String },
+    // Transition controls
+    TransitionList,
+    TransitionCurrent,
+    TransitionSet { transition_name: String },
+    TransitionDuration { duration_ms: u64 },
+    TransitionTrigger,
+    // Studio mode controls
+    StudioModeStatus,
+    StudioModeEnable,
+    StudioModeDisable,
+    StudioModeToggle,
+    StudioModeTransition,
+    // Preview scene controls (studio mode only)
+    PreviewCurrent,
+    PreviewSet { scene_name: String },
 }
 
 #[derive(Subcommand, Clone, Debug)]
 pub enum SceneCollection {
     Current,
+    List,
+    Create { scene_collection_name: String },
     Switch { scene_collection_name: String },
+}
+
+#[derive(Subcommand, Clone, Debug)]
+pub enum Profile {
+    Current,
+    List,
+    Create { profile_name: String },
+    Remove { profile_name: String },
+    Switch { profile_name: String },
+}
+
+#[derive(Subcommand, Clone, Debug)]
+pub enum VideoSettings {
+    Get,
+    Set {
+        #[clap(long)]
+        base_width: Option<u32>,
+        #[clap(long)]
+        base_height: Option<u32>,
+        #[clap(long)]
+        output_width: Option<u32>,
+        #[clap(long)]
+        output_height: Option<u32>,
+        #[clap(long)]
+        fps_num: Option<u32>,
+        #[clap(long)]
+        fps_den: Option<u32>,
+    },
+}
+
+#[derive(Subcommand, Clone, Debug)]
+pub enum StreamService {
+    Get,
+    Set {
+        #[clap(long)]
+        service_type: String,
+        #[clap(long)]
+        server: Option<String>,
+        #[clap(long)]
+        key: Option<String>,
+    },
+}
+
+#[derive(Subcommand, Clone, Debug)]
+pub enum RecordDirectory {
+    Get,
+    Set { directory: String },
 }
 
 /// Command-line interface for obs-cmd.
@@ -161,6 +229,18 @@ pub enum Commands {
 
     #[clap(subcommand)]
     SceneCollection(SceneCollection),
+
+    #[clap(subcommand)]
+    Profile(Profile),
+
+    #[clap(subcommand)]
+    VideoSettings(VideoSettings),
+
+    #[clap(subcommand)]
+    StreamService(StreamService),
+
+    #[clap(subcommand)]
+    RecordDirectory(RecordDirectory),
 
     #[clap(subcommand)]
     Replay(Replay),

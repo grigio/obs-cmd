@@ -2,7 +2,7 @@
 
 ## Notes
 
-Keep AGENTS.md updated with non-trivial project design, keep it minimal and essetial
+Keep AGENTS.md updated with non-trivial project design for developers, keep it minimal and essential. Update README.md instead for user related info.
 
 ## Technology Stack
 - **Rust 2021 Edition**: Command-line tool for OBS Studio control
@@ -11,6 +11,7 @@ Keep AGENTS.md updated with non-trivial project design, keep it minimal and esse
 - **tokio**: Async runtime with multi-threaded scheduler
 - **thiserror**: Error handling with derive macros
 - **async-trait**: Async trait support for command handlers
+- **serde_json**: JSON serialization for stream service settings
 - The official obs-websocket spec https://raw.githubusercontent.com/obsproject/obs-websocket/master/docs/generated/protocol.md
 
 ## Project Structure
@@ -23,6 +24,7 @@ src/
 ├── error.rs             # Comprehensive error type definitions
 └── handlers/            # Modular command handlers
     ├── mod.rs           # CommandHandler trait and utilities
+    ├── config.rs        # Config management (profiles, video, stream, record)
     ├── general.rs       # Info and hotkey commands
     ├── scenes.rs        # Scene management
     ├── recording.rs     # Recording control
@@ -54,8 +56,16 @@ src/
 
 ### CLI Design
 - Custom URL parsing for `obws://hostname:port/password` format in `src/cli.rs`
-- Subcommand structure for logical grouping (scenes, recording, streaming, etc.)
+- Subcommand structure for logical grouping (scenes, recording, streaming, config, etc.)
 - Duration parsing for media controls in `src/cli.rs`
+- Config management commands for profiles, video settings, stream service, and record directory
+
+### Config Management Features
+- **Profile Management**: List, create, remove, switch between OBS profiles
+- **Video Settings**: Get/set base resolution, output resolution, FPS settings
+- **Stream Service**: Get/set streaming service configuration (RTMP server, key)
+- **Record Directory**: Get/set the directory where recordings are saved
+- **Scene Collections**: List, create, switch between scene collections
 
 ## Development Commands
 ```bash

@@ -35,6 +35,44 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn test_scene_create_handler_description() {
+        let handler = SceneHandler {
+            action: Scene::Create {
+                scene_name: "test".to_string(),
+            },
+        };
+        assert_eq!(handler.description(), "Create new scene");
+    }
+
+    #[tokio::test]
+    async fn test_scene_transition_set_handler_description() {
+        let handler = SceneHandler {
+            action: Scene::TransitionSet {
+                transition_name: "Fade".to_string(),
+            },
+        };
+        assert_eq!(handler.description(), "Set current transition");
+    }
+
+    #[tokio::test]
+    async fn test_scene_studio_mode_enable_handler_description() {
+        let handler = SceneHandler {
+            action: Scene::StudioModeEnable,
+        };
+        assert_eq!(handler.description(), "Enable studio mode");
+    }
+
+    #[tokio::test]
+    async fn test_scene_preview_set_handler_description() {
+        let handler = SceneHandler {
+            action: Scene::PreviewSet {
+                scene_name: "preview".to_string(),
+            },
+        };
+        assert_eq!(handler.description(), "Set preview scene");
+    }
+
+    #[tokio::test]
     async fn test_media_input_handler_description() {
         let handler = MediaInputHandler {
             action: MediaInput::Play {

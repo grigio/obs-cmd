@@ -658,6 +658,7 @@ dependencies = [
  "async-trait",
  "clap",
  "obws",
+ "serde_json",
  "thiserror",
  "time",
  "tokio",

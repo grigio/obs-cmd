@@ -2,8 +2,10 @@ use crate::cli::Commands;
 use crate::connection::check_connection_health;
 use crate::error::Result;
 use crate::handlers::{
-    audio::AudioHandler, filters::FilterHandler, general::HotkeyHandler, general::InfoHandler,
-    media::MediaInputHandler, recording::RecordingHandler, replay_buffer::ReplayBufferHandler,
+    audio::AudioHandler, config::ProfileHandler, config::VideoSettingsHandler, 
+    config::StreamServiceHandler, config::RecordDirectoryHandler, filters::FilterHandler, 
+    general::HotkeyHandler, general::InfoHandler, media::MediaInputHandler, 
+    recording::RecordingHandler, replay_buffer::ReplayBufferHandler,
     scene_collections::SceneCollectionHandler, scene_items::SceneItemHandler, scenes::SceneHandler,
     sources::SourceHandler, streaming::StreamingHandler, ui::FullscreenProjectorHandler,
     ui::SourceProjectorHandler, virtual_camera::VirtualCameraHandler, CommandHandler,
@@ -31,6 +33,18 @@ pub async fn handle_commands(client: &Client, commands: &Commands) -> Result<()>
             action: action.clone(),
         }),
         Commands::SceneCollection(action) => Box::new(SceneCollectionHandler {
+            action: action.clone(),
+        }),
+        Commands::Profile(action) => Box::new(ProfileHandler {
+            action: action.clone(),
+        }),
+        Commands::VideoSettings(action) => Box::new(VideoSettingsHandler {
+            action: action.clone(),
+        }),
+        Commands::StreamService(action) => Box::new(StreamServiceHandler {
+            action: action.clone(),
+        }),
+        Commands::RecordDirectory(action) => Box::new(RecordDirectoryHandler {
             action: action.clone(),
         }),
         Commands::Recording(action) => Box::new(RecordingHandler {

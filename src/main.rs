@@ -1,7 +1,10 @@
+#![allow(clippy::redundant_closure, clippy::result_large_err)]
+
 mod cli;
 mod connection;
 mod error;
 mod handler;
+mod handlers;
 
 use clap::Parser;
 use cli::{Cli, ObsWebsocket};
@@ -27,13 +30,9 @@ async fn main() -> Result<()> {
                     )
                 })?
                 .to_string();
-            let port = parsed_url
-                .port()
-                .ok_or_else(|| {
-                    ObsCmdError::WebSocketUrlParseError(
-                        "Missing port in WebSocket URL".to_string(),
-                    )
-                })?;
+            let port = parsed_url.port().ok_or_else(|| {
+                ObsCmdError::WebSocketUrlParseError("Missing port in WebSocket URL".to_string())
+            })?;
             let password = parsed_url
                 .path_segments()
                 .and_then(|mut segments| segments.next())

@@ -3,23 +3,39 @@
 ## Technology Stack
 - **Rust 2021 Edition**: Command-line tool for OBS Studio control
 - **obws**: OBS WebSocket client library
-- **clap**: Command-line argument parsing
-- **tokio**: Async runtime
+- **clap**: Command-line argument parsing with derive macros
+- **tokio**: Async runtime with multi-threaded scheduler
+- **thiserror**: Error handling with derive macros
+- **async-trait**: Async trait support for command handlers
 - The official obs-websocket spec https://raw.githubusercontent.com/obsproject/obs-websocket/master/docs/generated/protocol.md
 
-## Project Structure
-```
-src/
-├── main.rs          # Application entry point and WebSocket connection
-├── cli.rs           # CLI argument definitions and parsing
-└── handler.rs       # Command handling and OBS API calls
-```
+## Architecture Patterns
+
+### Command Handler Pattern
+- All OBS operations implement `CommandHandler` trait in `src/handlers/mod.rs`
+- Trait provides `execute()` and `description()` methods for consistent interface
+- Handlers are boxed and dispatched in `src/handler.rs`
+
+### Connection Management
+- Retry logic with configurable timeouts in `src/connection.rs`
+- Connection health checks before command execution in `src/handler.rs`
+- Support for both CLI args and `OBS_WEBSOCKET_URL` environment variable
+
+### Error Handling
+- Comprehensive error types in `src/error.rs` using thiserror
+- Result type alias for consistent error handling
+- Detailed error messages with actionable guidance
+
+### CLI Design
+- Custom URL parsing for `obws://hostname:port/password` format in `src/cli.rs`
+- Subcommand structure for logical grouping (scenes, recording, streaming, etc.)
+- Duration parsing for media controls in `src/cli.rs`
 
 ## Development Commands
 ```bash
 # Build and run
 cargo run                    # Build and run locally
-cargo build --release        # Release build
+cargo build --release        # Release build with optimizations
 
 # Code quality
 cargo fmt                    # Format code
@@ -28,55 +44,19 @@ cargo test                   # Run tests
 
 # Dependency management
 cargo update                 # Update dependencies
-cargo outdated               # Check for outdated dependencies
 cargo audit                  # Security audit
 cargo deny check             # License and dependency checks
-
 
 # Installation
 cargo install --path .       # Install locally
 ```
 
-## Key Components
+## Release Configuration
+- Optimized release profile in `Cargo.toml` with size optimizations
+- LTO enabled, single codegen unit, panic=abort for smaller binaries
+- Strip symbols for reduced binary size
 
-### CLI Structure (cli.rs)
-- Defines all OBS commands using clap subcommands
-- Handles WebSocket URL parsing and validation
-- Supports environment variable `OBS_WEBSOCKET_URL` for connection
-
-### Command Handler (handler.rs)
-- Implements all OBS operations via obws client
-- Handles scenes, recording, streaming, audio, filters, and more
-- Provides error handling and user feedback
-
-### Main Entry (main.rs)
-- Establishes WebSocket connection to OBS
-- Supports both CLI flag and environment variable configuration
-- Routes commands to handler
-
-## Common Patterns
-- Async/await for all WebSocket operations
-- Result-based error handling throughout
-- Subcommand structure for logical command grouping
-- Environment variable fallback for configuration
-
-## GitHub Workflows
-
-### Development Workflow (rust.yml)
-- **Triggers**: Push/PR to main/master branch
-- **Platforms**: Ubuntu, macOS, Windows
-- **Jobs**: Testing, code coverage, performance benchmarks
-
-### Security & Quality (security.yml)
-- **Triggers**: Push/PR to main/master + daily schedule
-- **Jobs**: Security audit, code quality, dependency analysis, secrets scan
-
-### Release Automation (release.yml)
-- **Triggers**: Git tags starting with `v*`
-- **Features**: Multi-platform builds, automatic changelog, GitHub releases
-
-### Branch Protection
-Configure `main`/`master` branch to require:
-- Rust workflow checks
-- Security workflow checks
-- Code quality validation
+## Security & Quality
+- License compliance via deny.toml
+- GitHub workflows for automated testing and security scanning
+- Branch protection requiring workflow checks

@@ -4,7 +4,7 @@ use std::str::FromStr;
 use url::Url;
 
 /// OBS WebSocket connection configuration.
-/// 
+///
 /// This struct represents the connection parameters for connecting
 /// to an OBS WebSocket server, typically parsed from a URL string.
 #[derive(Clone, Debug)]
@@ -114,22 +114,22 @@ pub enum SceneCollection {
 }
 
 /// Command-line interface for obs-cmd.
-/// 
+///
 /// This struct defines the main CLI interface using clap for parsing.
 /// It supports connecting to OBS WebSocket and executing various commands.
-/// 
+///
 /// # Examples
-/// 
+///
 /// ```bash
 /// # Get OBS version info
 /// obs-cmd info
-/// 
+///
 /// # Start recording
 /// obs-cmd recording start
-/// 
+///
 /// # Switch to a scene
 /// obs-cmd scene switch "Main Scene"
-/// 
+///
 /// # Connect to custom OBS WebSocket
 /// obs-cmd --websocket obsws://192.168.1.100:4455/password info
 /// ```
@@ -137,19 +137,19 @@ pub enum SceneCollection {
 #[clap(author, version, about, long_about = None)]
 pub struct Cli {
     /// OBS WebSocket connection URL.
-    /// 
+    ///
     /// If not provided, defaults to `obsws://localhost:4455/secret`.
     /// Can also be set via OBS_WEBSOCKET_URL environment variable.
     #[clap(short, long)]
     pub websocket: Option<ObsWebsocket>,
-    
+
     /// The command to execute on OBS.
     #[clap(subcommand)]
     pub command: Commands,
 }
 
 /// Available commands for controlling OBS.
-/// 
+///
 /// This enum represents all possible operations that can be performed
 /// on OBS Studio via the WebSocket interface.
 #[derive(Subcommand)]
@@ -257,23 +257,23 @@ pub enum MediaInput {
 }
 
 /// Parses duration strings in [hh:]mm:ss format.
-/// 
+///
 /// This function converts human-readable time strings into Duration objects.
 /// Supports both minute:second and hour:minute:second formats.
-/// 
+///
 /// # Examples
-/// 
+///
 /// * "0:00" -> 0 seconds
 /// * "01:00" -> 1 minute  
 /// * "1:00:00" -> 1 hour
 /// * "1:30:45" -> 1 hour, 30 minutes, 45 seconds
-/// 
+///
 /// # Arguments
-/// 
+///
 /// * `s` - The duration string to parse
-/// 
+///
 /// # Returns
-/// 
+///
 /// Returns a `time::Duration` on success, or an error string if format is invalid
 fn parse_duration(s: &str) -> Result<time::Duration, String> {
     let parts = s

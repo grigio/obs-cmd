@@ -1,39 +1,53 @@
 mod cli;
+mod connection;
+mod error;
 mod handler;
 
 use clap::Parser;
 use cli::{Cli, ObsWebsocket};
+use connection::{connect_with_retry, ConnectionConfig};
+use error::Result;
 use handler::handle_commands;
-use obws::Client;
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+#[allow(clippy::result_large_err)]
+async fn main() -> Result<()> {
     let cli = Cli::parse();
+
+    let config = ConnectionConfig::default();
 
     let client = match std::env::var("OBS_WEBSOCKET_URL") {
         Ok(url) => {
-            let parsed_url = url::Url::parse(&url).expect("Invalid OBS_WEBSOCKET_URL format");
+            let parsed_url = url::Url::parse(&url)?;
             let hostname = parsed_url
                 .host_str()
-                .expect("Hostname not found in OBS_WEBSOCKET_URL")
+                .ok_or(url::ParseError::RelativeUrlWithoutBase)?
                 .to_string();
             let port = parsed_url
                 .port()
-                .expect("Port not found in OBS_WEBSOCKET_URL");
+                .ok_or(url::ParseError::RelativeUrlWithoutBase)?;
             let password = parsed_url
                 .path_segments()
                 .and_then(|mut segments| segments.next())
                 .ok_or(url::ParseError::RelativeUrlWithoutBase)?;
 
-            Client::connect(hostname, port, Some(password)).await?
+            connect_with_retry(hostname, port, Some(password.to_string()), config).await?
         }
         Err(_) => match cli.websocket {
             Some(ObsWebsocket {
                 hostname,
                 port,
                 password,
-            }) => Client::connect(hostname, port, password).await?,
-            None => Client::connect("localhost", 4455, Some("secret")).await?,
+            }) => connect_with_retry(hostname, port, password, config).await?,
+            None => {
+                connect_with_retry(
+                    "localhost".to_string(),
+                    4455,
+                    Some("secret".to_string()),
+                    config,
+                )
+                .await?
+            }
         },
     };
 

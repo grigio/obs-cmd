@@ -1,6 +1,8 @@
 use crate::cli::{
     Commands, MediaInput, Recording, Replay, Scene, SceneCollection, Streaming, VirtualCamera,
 };
+use crate::connection::check_connection_health;
+use crate::error::{ObsCmdError, Result};
 use obws::common::MediaAction;
 use obws::requests::filters::SetEnabled as SetEnabledFilter;
 use obws::requests::scene_items::Id as IdItem;
@@ -8,10 +10,12 @@ use obws::requests::scene_items::SetEnabled as SetEnabledItem;
 use obws::requests::sources::SaveScreenshot;
 use obws::Client;
 
-pub async fn handle_commands(
-    client: &Client,
-    commands: &Commands,
-) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn handle_commands(client: &Client, commands: &Commands) -> Result<()> {
+    // Check connection health before executing commands
+    if let Err(e) = check_connection_health(client).await {
+        eprintln!("Warning: Connection health check failed: {}", e);
+        // Continue with command execution but warn user
+    }
     match commands {
         Commands::MediaInput(media_input) => match media_input {
             MediaInput::SetCursor { name, cursor } => {
@@ -134,13 +138,9 @@ pub async fn handle_commands(
                     if status.active && !status.paused {
                         println!("Active (started and running)");
                     } else if !status.active {
-                        let error_message = "Inactive (not started)";
-                        println!("{error_message}");
-                        Err(error_message)?;
+                        Err(ObsCmdError::RecordingNotActive)?;
                     } else {
-                        let error_message = "Inactive (not running)";
-                        println!("{error_message}");
-                        Err(error_message)?;
+                        Err(ObsCmdError::RecordingPaused)?;
                     }
                 }
                 Pause => {
@@ -273,9 +273,7 @@ pub async fn handle_commands(
                 LastReplay => {
                     let res = client.replay_buffer().last_replay().await?;
                     if res.is_empty() {
-                        let error_message = "No last replay found";
-                        println!("{error_message}");
-                        Err(error_message)?;
+                        return Err(ObsCmdError::NoLastReplay);
                     }
                     println!("Replay path: {res:?}");
                 }
@@ -295,9 +293,9 @@ pub async fn handle_commands(
                     return Ok(());
                 }
                 _ => {
-                    let error_message = format!("Invalid audio command: {command:?}");
-                    println!("{error_message}");
-                    return Err(error_message)?;
+                    return Err(ObsCmdError::InvalidAudioCommand {
+                        command: command.clone(),
+                    });
                 }
             };
             let res = client
@@ -326,9 +324,9 @@ pub async fn handle_commands(
                         .enabled
                 }
                 _ => {
-                    let error_message = format!("Invalid filter command: {command:?}");
-                    println!("{error_message}");
-                    return Err(error_message)?;
+                    return Err(ObsCmdError::InvalidFilterCommand {
+                        command: command.clone(),
+                    });
                 }
             };
             let res = client
@@ -371,9 +369,9 @@ pub async fn handle_commands(
                         .await?
                 }
                 _ => {
-                    let error_message = format!("Invalid scene item command: {command:?}");
-                    println!("{error_message}");
-                    return Err(error_message)?;
+                    return Err(ObsCmdError::InvalidSceneItemCommand {
+                        command: command.clone(),
+                    });
                 }
             }; // use item_id in setenabled
             let res = client
@@ -412,10 +410,12 @@ pub async fn handle_commands(
                     println!("Result: {res:?}");
                     res?;
                 } else {
-                    Err("Monitor not in list")?;
+                    return Err(ObsCmdError::MonitorNotAvailable {
+                        index: *monitor_index as u32,
+                    });
                 }
             } else {
-                Err("No monitor list received")?;
+                return Err(ObsCmdError::NoMonitorList);
             }
         }
 
@@ -438,10 +438,12 @@ pub async fn handle_commands(
                     println!("Result: {res:?}");
                     res?;
                 } else {
-                    Err("Monitor not in list")?;
+                    return Err(ObsCmdError::MonitorNotAvailable {
+                        index: *monitor_index as u32,
+                    });
                 }
             } else {
-                Err("No monitor list received")?;
+                return Err(ObsCmdError::NoMonitorList);
             }
         }
     }

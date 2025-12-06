@@ -5,13 +5,15 @@ edition = "2021"
 description = "A minimal command to control obs via obs-websocket"
 authors = ["Luigi Maselli <luigi@grigio.org>"]
 rust-version = "1.88.0"
+license = "MIT"
 
 [[bin]]
 name = "obs-cmd"
 
 [dependencies]
-tokio = { version = "1.45.0", features = ["rt-multi-thread", "macros"] }
+tokio = { version = "1.48.0", features = ["rt-multi-thread", "macros", "time"] }
 obws = "0.14.0"
-clap = { version = "4.5.39", features = ["derive"] }
+clap = { version = "4.5.53", features = ["derive"] }
 url = "2.5.4"
 time = "0.3.41"
+thiserror = "2.0.17"

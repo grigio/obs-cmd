@@ -12,6 +12,9 @@ allow = [
 [bans]
 multiple-versions = "warn"
 wildcards = "allow"
+skip = [
+    { name = "windows-sys", version = ">=0.52.0,<1.0.0" },
+]
 
 [sources]
 allow-registry = ["https://github.com/rust-lang/crates.io-index"]

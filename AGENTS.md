@@ -1,5 +1,9 @@
 # obs-cmd Guide
 
+## Notes
+
+Keep AGENTS.md updated with non-trivial project design, keep it minimal and essetial
+
 ## Technology Stack
 - **Rust 2021 Edition**: Command-line tool for OBS Studio control
 - **obws**: OBS WebSocket client library
@@ -8,6 +12,28 @@
 - **thiserror**: Error handling with derive macros
 - **async-trait**: Async trait support for command handlers
 - The official obs-websocket spec https://raw.githubusercontent.com/obsproject/obs-websocket/master/docs/generated/protocol.md
+
+## Project Structure
+```
+src/
+├── main.rs              # Entry point with connection setup
+├── cli.rs               # CLI argument parsing and command definitions
+├── connection.rs        # WebSocket connection management with retry logic
+├── handler.rs           # Command dispatcher routing to handlers
+├── error.rs             # Comprehensive error type definitions
+└── handlers/            # Modular command handlers
+    ├── mod.rs           # CommandHandler trait and utilities
+    ├── general.rs       # Info and hotkey commands
+    ├── scenes.rs        # Scene management
+    ├── recording.rs     # Recording control
+    ├── streaming.rs     # Streaming control
+    ├── audio.rs         # Audio source management
+    ├── filters.rs       # Filter management
+    ├── media.rs         # Media input control
+    ├── sources.rs       # Source screenshots
+    ├── ui.rs            # Projector management
+    └── ...              # Other specialized handlers
+```
 
 ## Architecture Patterns
 

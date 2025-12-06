@@ -62,12 +62,12 @@ cargo install --path .       # Install locally
 ## GitHub Workflows
 
 ### Development Workflow (rust.yml)
-- **Triggers**: Push/PR to main branch
+- **Triggers**: Push/PR to main/master branch
 - **Platforms**: Ubuntu, macOS, Windows
 - **Jobs**: Testing, code coverage, performance benchmarks
 
 ### Security & Quality (security.yml)
-- **Triggers**: Push/PR to main + daily schedule
+- **Triggers**: Push/PR to main/master + daily schedule
 - **Jobs**: Security audit, code quality, dependency analysis, secrets scan
 
 ### Release Automation (release.yml)
@@ -75,7 +75,7 @@ cargo install --path .       # Install locally
 - **Features**: Multi-platform builds, automatic changelog, GitHub releases
 
 ### Branch Protection
-Configure `main` branch to require:
+Configure `main`/`master` branch to require:
 - Rust workflow checks
 - Security workflow checks
 - Code quality validation

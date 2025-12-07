@@ -55,30 +55,58 @@ impl CommandHandler for SceneItemHandler {
                 );
             }
             SceneItem::Remove { scene, source } => {
-                let item_id = get_scene_item_id(client, scene, source).await?;
+                // Check if source path contains a group separator "/"
+                let target_scene = if let Some(slash_pos) = source.find('/') {
+                    &source[..slash_pos]
+                } else {
+                    scene
+                };
+
+                let item_id = get_scene_item_id(client, target_scene, source).await?;
                 client
                     .scene_items()
-                    .remove(SceneId::Name(scene), item_id)
+                    .remove(SceneId::Name(target_scene), item_id)
                     .await
                     .map_err(|e| ObsCmdError::ConnectionError(e))?;
 
-                println!("Removed scene item '{}' from scene '{}'", source, scene);
+                println!(
+                    "Removed scene item '{}' from {}",
+                    source,
+                    if target_scene == scene {
+                        format!("scene '{}'", scene)
+                    } else {
+                        format!("group '{}' in scene '{}'", target_scene, scene)
+                    }
+                );
             }
             SceneItem::Duplicate { scene, source } => {
-                let item_id = get_scene_item_id(client, scene, source).await?;
+                // Check if source path contains a group separator "/"
+                let target_scene = if let Some(slash_pos) = source.find('/') {
+                    &source[..slash_pos]
+                } else {
+                    scene
+                };
+
+                let item_id = get_scene_item_id(client, target_scene, source).await?;
                 let new_item_id = client
                     .scene_items()
                     .duplicate(Duplicate {
-                        scene: SceneId::Name(scene),
+                        scene: SceneId::Name(target_scene),
                         item_id,
-                        destination: None, // Duplicate to same scene
+                        destination: None, // Duplicate to same scene/group
                     })
                     .await
                     .map_err(|e| ObsCmdError::ConnectionError(e))?;
 
                 println!(
-                    "Duplicated scene item '{}' in scene '{}' with new ID: {}",
-                    source, scene, new_item_id
+                    "Duplicated scene item '{}' in {} with new ID: {}",
+                    source,
+                    if target_scene == scene {
+                        format!("scene '{}'", scene)
+                    } else {
+                        format!("group '{}' in scene '{}'", target_scene, scene)
+                    },
+                    new_item_id
                 );
             }
             SceneItem::Enable { scene, source } => {
@@ -90,19 +118,30 @@ impl CommandHandler for SceneItemHandler {
                 println!("Disabled scene item '{}' in scene '{}'", source, scene);
             }
             SceneItem::Toggle { scene, source } => {
-                let item_id = get_scene_item_id(client, scene, source).await?;
+                // Check if source path contains a group separator "/"
+                let target_scene = if let Some(slash_pos) = source.find('/') {
+                    &source[..slash_pos]
+                } else {
+                    scene
+                };
+
+                let item_id = get_scene_item_id(client, target_scene, source).await?;
                 let current_state = client
                     .scene_items()
-                    .enabled(SceneId::Name(scene), item_id)
+                    .enabled(SceneId::Name(target_scene), item_id)
                     .await
                     .map_err(|e| ObsCmdError::ConnectionError(e))?;
                 let new_state = !current_state;
 
-                set_scene_item_enabled(client, scene, source, new_state).await?;
+                set_scene_item_enabled(client, target_scene, source, new_state).await?;
                 println!(
-                    "Scene item '{}' in scene '{}': {}",
+                    "Scene item '{}' in {}: {}",
                     source,
-                    scene,
+                    if target_scene == scene {
+                        format!("scene '{}'", scene)
+                    } else {
+                        format!("group '{}' in scene '{}'", target_scene, scene)
+                    },
                     if new_state { "enabled" } else { "disabled" }
                 );
             }
@@ -115,16 +154,28 @@ impl CommandHandler for SceneItemHandler {
                 println!("Unlocked scene item '{}' in scene '{}'", source, scene);
             }
             SceneItem::GetTransform { scene, source } => {
-                let item_id = get_scene_item_id(client, scene, source).await?;
+                // Check if source path contains a group separator "/"
+                let target_scene = if let Some(slash_pos) = source.find('/') {
+                    &source[..slash_pos]
+                } else {
+                    scene
+                };
+
+                let item_id = get_scene_item_id(client, target_scene, source).await?;
                 let transform = client
                     .scene_items()
-                    .transform(SceneId::Name(scene), item_id)
+                    .transform(SceneId::Name(target_scene), item_id)
                     .await
                     .map_err(|e| ObsCmdError::ConnectionError(e))?;
 
                 println!(
-                    "Transform for scene item '{}' in scene '{}':",
-                    source, scene
+                    "Transform for scene item '{}' in {}:",
+                    source,
+                    if target_scene == scene {
+                        format!("scene '{}'", scene)
+                    } else {
+                        format!("group '{}' in scene '{}'", target_scene, scene)
+                    }
                 );
                 println!(
                     "  Position: X: {}, Y: {}",
@@ -156,12 +207,19 @@ impl CommandHandler for SceneItemHandler {
                 crop_top,
                 crop_bottom,
             } => {
-                let item_id = get_scene_item_id(client, scene, source).await?;
+                // Check if source path contains a group separator "/"
+                let target_scene = if let Some(slash_pos) = source.find('/') {
+                    &source[..slash_pos]
+                } else {
+                    scene
+                };
+
+                let item_id = get_scene_item_id(client, target_scene, source).await?;
 
                 // Get current transform to use as base
                 let _current_transform = client
                     .scene_items()
-                    .transform(SceneId::Name(scene), item_id)
+                    .transform(SceneId::Name(target_scene), item_id)
                     .await
                     .map_err(|e| ObsCmdError::ConnectionError(e))?;
 
@@ -204,7 +262,7 @@ impl CommandHandler for SceneItemHandler {
                 client
                     .scene_items()
                     .set_transform(SetTransform {
-                        scene: SceneId::Name(scene),
+                        scene: SceneId::Name(target_scene),
                         item_id,
                         transform,
                     })
@@ -212,21 +270,39 @@ impl CommandHandler for SceneItemHandler {
                     .map_err(|e| ObsCmdError::ConnectionError(e))?;
 
                 println!(
-                    "Updated transform for scene item '{}' in scene '{}'",
-                    source, scene
+                    "Updated transform for scene item '{}' in {}",
+                    source,
+                    if target_scene == scene {
+                        format!("scene '{}'", scene)
+                    } else {
+                        format!("group '{}' in scene '{}'", target_scene, scene)
+                    }
                 );
             }
             SceneItem::GetIndex { scene, source } => {
-                let item_id = get_scene_item_id(client, scene, source).await?;
+                // Check if source path contains a group separator "/"
+                let target_scene = if let Some(slash_pos) = source.find('/') {
+                    &source[..slash_pos]
+                } else {
+                    scene
+                };
+
+                let item_id = get_scene_item_id(client, target_scene, source).await?;
                 let index = client
                     .scene_items()
-                    .index(SceneId::Name(scene), item_id)
+                    .index(SceneId::Name(target_scene), item_id)
                     .await
                     .map_err(|e| ObsCmdError::ConnectionError(e))?;
 
                 println!(
-                    "Scene item '{}' in scene '{}' has index: {}",
-                    source, scene, index
+                    "Scene item '{}' in {} has index: {}",
+                    source,
+                    if target_scene == scene {
+                        format!("scene '{}'", scene)
+                    } else {
+                        format!("group '{}' in scene '{}'", target_scene, scene)
+                    },
+                    index
                 );
             }
             SceneItem::SetIndex {
@@ -234,11 +310,18 @@ impl CommandHandler for SceneItemHandler {
                 source,
                 index,
             } => {
-                let item_id = get_scene_item_id(client, scene, source).await?;
+                // Check if source path contains a group separator "/"
+                let target_scene = if let Some(slash_pos) = source.find('/') {
+                    &source[..slash_pos]
+                } else {
+                    scene
+                };
+
+                let item_id = get_scene_item_id(client, target_scene, source).await?;
                 client
                     .scene_items()
                     .set_index(SetIndex {
-                        scene: SceneId::Name(scene),
+                        scene: SceneId::Name(target_scene),
                         item_id,
                         index: *index,
                     })
@@ -246,21 +329,40 @@ impl CommandHandler for SceneItemHandler {
                     .map_err(|e| ObsCmdError::ConnectionError(e))?;
 
                 println!(
-                    "Set scene item '{}' in scene '{}' to index: {}",
-                    source, scene, index
+                    "Set scene item '{}' in {} to index: {}",
+                    source,
+                    if target_scene == scene {
+                        format!("scene '{}'", scene)
+                    } else {
+                        format!("group '{}' in scene '{}'", target_scene, scene)
+                    },
+                    index
                 );
             }
             SceneItem::GetBlendMode { scene, source } => {
-                let item_id = get_scene_item_id(client, scene, source).await?;
+                // Check if source path contains a group separator "/"
+                let target_scene = if let Some(slash_pos) = source.find('/') {
+                    &source[..slash_pos]
+                } else {
+                    scene
+                };
+
+                let item_id = get_scene_item_id(client, target_scene, source).await?;
                 let blend_mode = client
                     .scene_items()
-                    .blend_mode(SceneId::Name(scene), item_id)
+                    .blend_mode(SceneId::Name(target_scene), item_id)
                     .await
                     .map_err(|e| ObsCmdError::ConnectionError(e))?;
 
                 println!(
-                    "Scene item '{}' in scene '{}' has blend mode: {:?}",
-                    source, scene, blend_mode
+                    "Scene item '{}' in {} has blend mode: {:?}",
+                    source,
+                    if target_scene == scene {
+                        format!("scene '{}'", scene)
+                    } else {
+                        format!("group '{}' in scene '{}'", target_scene, scene)
+                    },
+                    blend_mode
                 );
             }
             SceneItem::SetBlendMode {
@@ -268,13 +370,20 @@ impl CommandHandler for SceneItemHandler {
                 source,
                 blend_mode,
             } => {
-                let item_id = get_scene_item_id(client, scene, source).await?;
+                // Check if source path contains a group separator "/"
+                let target_scene = if let Some(slash_pos) = source.find('/') {
+                    &source[..slash_pos]
+                } else {
+                    scene
+                };
+
+                let item_id = get_scene_item_id(client, target_scene, source).await?;
                 let parsed_blend_mode = parse_blend_mode(blend_mode)?;
 
                 client
                     .scene_items()
                     .set_blend_mode(SetBlendMode {
-                        scene: SceneId::Name(scene),
+                        scene: SceneId::Name(target_scene),
                         item_id,
                         mode: parsed_blend_mode,
                     })
@@ -282,8 +391,14 @@ impl CommandHandler for SceneItemHandler {
                     .map_err(|e| ObsCmdError::ConnectionError(e))?;
 
                 println!(
-                    "Set scene item '{}' in scene '{}' blend mode to: {:?}",
-                    source, scene, parsed_blend_mode
+                    "Set scene item '{}' in {} blend mode to: {:?}",
+                    source,
+                    if target_scene == scene {
+                        format!("scene '{}'", scene)
+                    } else {
+                        format!("group '{}' in scene '{}'", target_scene, scene)
+                    },
+                    parsed_blend_mode
                 );
             }
         }
@@ -313,16 +428,37 @@ impl CommandHandler for SceneItemHandler {
 }
 
 /// Helper function to get scene item ID by scene and source name
+/// Supports both regular scenes and groups (for nested sources)
+/// For nested sources in groups, source can be specified as "Group/SourceName"
 async fn get_scene_item_id(client: &Client, scene: &str, source: &str) -> Result<i64> {
-    client
-        .scene_items()
-        .id(IdItem {
-            scene: SceneId::Name(scene),
-            source,
-            search_offset: Some(0),
-        })
-        .await
-        .map_err(|e| ObsCmdError::ConnectionError(e))
+    // Check if source path contains a group separator "/"
+    if let Some(slash_pos) = source.find('/') {
+        // Split into group name and source name
+        let group_name = &source[..slash_pos];
+        let nested_source_name = &source[slash_pos + 1..];
+
+        // Search within the group
+        client
+            .scene_items()
+            .id(IdItem {
+                scene: SceneId::Name(group_name),
+                source: nested_source_name,
+                search_offset: Some(0),
+            })
+            .await
+            .map_err(|e| ObsCmdError::ConnectionError(e))
+    } else {
+        // Direct search in the scene
+        client
+            .scene_items()
+            .id(IdItem {
+                scene: SceneId::Name(scene),
+                source,
+                search_offset: Some(0),
+            })
+            .await
+            .map_err(|e| ObsCmdError::ConnectionError(e))
+    }
 }
 
 /// Helper function to set scene item enabled state
@@ -332,16 +468,34 @@ async fn set_scene_item_enabled(
     source: &str,
     enabled: bool,
 ) -> Result<()> {
-    let item_id = get_scene_item_id(client, scene, source).await?;
-    client
-        .scene_items()
-        .set_enabled(SetEnabledItem {
-            scene: SceneId::Name(scene),
-            item_id,
-            enabled,
-        })
-        .await
-        .map_err(|e| ObsCmdError::ConnectionError(e))
+    // Check if source path contains a group separator "/"
+    if let Some(slash_pos) = source.find('/') {
+        // Split into group name and source name
+        let group_name = &source[..slash_pos];
+        let nested_source_name = &source[slash_pos + 1..];
+
+        let item_id = get_scene_item_id(client, group_name, nested_source_name).await?;
+        client
+            .scene_items()
+            .set_enabled(SetEnabledItem {
+                scene: SceneId::Name(group_name),
+                item_id,
+                enabled,
+            })
+            .await
+            .map_err(|e| ObsCmdError::ConnectionError(e))
+    } else {
+        let item_id = get_scene_item_id(client, scene, source).await?;
+        client
+            .scene_items()
+            .set_enabled(SetEnabledItem {
+                scene: SceneId::Name(scene),
+                item_id,
+                enabled,
+            })
+            .await
+            .map_err(|e| ObsCmdError::ConnectionError(e))
+    }
 }
 
 /// Helper function to set scene item locked state
@@ -351,16 +505,34 @@ async fn set_scene_item_locked(
     source: &str,
     locked: bool,
 ) -> Result<()> {
-    let item_id = get_scene_item_id(client, scene, source).await?;
-    client
-        .scene_items()
-        .set_locked(SetLocked {
-            scene: SceneId::Name(scene),
-            item_id,
-            locked,
-        })
-        .await
-        .map_err(|e| ObsCmdError::ConnectionError(e))
+    // Check if source path contains a group separator "/"
+    if let Some(slash_pos) = source.find('/') {
+        // Split into group name and source name
+        let group_name = &source[..slash_pos];
+        let nested_source_name = &source[slash_pos + 1..];
+
+        let item_id = get_scene_item_id(client, group_name, nested_source_name).await?;
+        client
+            .scene_items()
+            .set_locked(SetLocked {
+                scene: SceneId::Name(group_name),
+                item_id,
+                locked,
+            })
+            .await
+            .map_err(|e| ObsCmdError::ConnectionError(e))
+    } else {
+        let item_id = get_scene_item_id(client, scene, source).await?;
+        client
+            .scene_items()
+            .set_locked(SetLocked {
+                scene: SceneId::Name(scene),
+                item_id,
+                locked,
+            })
+            .await
+            .map_err(|e| ObsCmdError::ConnectionError(e))
+    }
 }
 
 /// Parse blend mode string to BlendMode enum

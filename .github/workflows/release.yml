@@ -69,7 +69,13 @@ jobs:
           - target: aarch64-apple-darwin
             arch: arm64
             os: macos
-    runs-on: ${{ matrix.os == 'windows' && 'windows-latest' || matrix.os == 'macos' && 'macos-latest' || 'ubuntu-latest' }}
+          - target: x86_64-unknown-freebsd
+            arch: x64
+            os: freebsd
+          - target: aarch64-unknown-freebsd
+            arch: arm64
+            os: freebsd
+    runs-on: ${{ matrix.os == 'freebsd' && 'ubuntu-latest' || matrix.os == 'windows' && 'windows-latest' || matrix.os == 'macos' && 'macos-latest' || 'ubuntu-latest' }}
     
     steps:
       - uses: actions/checkout@v4
@@ -82,6 +88,7 @@ jobs:
 
           
       - name: Cache cargo registry
+        if: matrix.os != 'freebsd'
         uses: actions/cache@v4
         with:
           path: |
@@ -93,8 +100,21 @@ jobs:
             ${{ runner.os }}-${{ matrix.target }}-cargo-
             
       - name: Build release binary
+        if: matrix.os != 'freebsd'
         run: |
           cargo build --release --target ${{ matrix.target }}
+          
+      - name: Build release binary (FreeBSD)
+        if: matrix.os == 'freebsd'
+        uses: vmactions/freebsd-vm@v1
+        with:
+          release: '15.0'
+          usesh: true
+          prepare: |
+            pkg update -f
+            pkg install -y rust
+          run: |
+            cargo build --release --target ${{ matrix.target }}
           
       - name: Create release archive (Unix)
         if: matrix.os != 'windows'
@@ -104,6 +124,20 @@ jobs:
           strip release/obs-cmd${{ matrix.os == 'windows' && '.exe' || '' }} || true
           tar -czf obs-cmd-${{ matrix.arch }}-${{ matrix.os }}.tar.gz -C release obs-cmd${{ matrix.os == 'windows' && '.exe' || '' }}
           
+      - name: Create release archive (FreeBSD)
+        if: matrix.os == 'freebsd'
+        uses: vmactions/freebsd-vm@v1
+        with:
+          release: '15.0'
+          usesh: true
+          prepare: |
+            pkg install -y rust
+          run: |
+            mkdir -p release
+            cp target/${{ matrix.target }}/release/obs-cmd release/
+            strip release/obs-cmd || true
+            tar -czf obs-cmd-${{ matrix.arch }}-${{ matrix.os }}.tar.gz -C release obs-cmd
+            
       - name: Create release archive (Windows)
         if: matrix.os == 'windows'
         run: |

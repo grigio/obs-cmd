@@ -71,12 +71,18 @@ jobs:
           usesh: true
           prepare: |
             pkg update -f
-            pkg install -y rust
+            pkg install -y rust pkgconf
+            # Install additional build dependencies that might be needed
+            pkg install -y openssl cmake gmake
           run: |
             rustc --version
             cargo --version
             pwd
             ls -lah
+            # Set environment variables for FreeBSD
+            export OPENSSL_DIR=/usr/local
+            export OPENSSL_LIB_DIR=/usr/local/lib
+            export OPENSSL_INCLUDE_DIR=/usr/local/include
             cargo fmt --all -- --check
             cargo clippy --all-targets --all-features -- -D warnings
             cargo build --verbose

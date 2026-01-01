@@ -72,9 +72,6 @@ jobs:
           - target: x86_64-unknown-freebsd
             arch: x64
             os: freebsd
-          - target: aarch64-unknown-freebsd
-            arch: arm64
-            os: freebsd
     runs-on: ${{ matrix.os == 'freebsd' && 'ubuntu-latest' || matrix.os == 'windows' && 'windows-latest' || matrix.os == 'macos' && 'macos-latest' || 'ubuntu-latest' }}
     
     steps:

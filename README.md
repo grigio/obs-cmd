@@ -20,6 +20,9 @@
 - **System Info**: Get OBS Studio version and connection information
 - **Shell Completion**: Auto-completion support for bash, zsh, fish, and other shells
 
+See [OBS_WEBSOCKET_V5_STATUS.md](./OBS_WEBSOCKET_V5_STATUS.md) for detailed protocol compatibility information.
+
+
 ## Installation
 
 ### Binaries

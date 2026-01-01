@@ -8,7 +8,7 @@
 ## Features
 
 - **Scene Management**: Switch between scenes, get current scene, manage scene collections
-- **Recording Control**: Start, stop, pause, resume recording with status monitoring
+- **Recording Control**: Start, stop, pause, resume recording with chapter creation and status monitoring
 - **Streaming Control**: Start, stop, toggle streaming with status checking
 - **Source Control**: Toggle filters, mute/unmute audio sources, show/hide scene items
 - **Virtual Camera**: Start, stop, toggle virtual camera output
@@ -100,6 +100,10 @@ obs-cmd recording toggle
 obs-cmd recording pause
 obs-cmd recording resume
 obs-cmd recording toggle-pause
+
+# Create recording chapters (requires Hybrid MP4 format)
+obs-cmd recording create-chapter
+obs-cmd recording create-chapter "Chapter Name"
 
 # Check recording status
 obs-cmd recording status
@@ -290,7 +294,7 @@ obs-cmd scene switch "Live"
 
 ## Requirements
 
-- **OBS Studio** 28.0+ with obs-websocket v5 plugin
+- **OBS Studio** 30.0+ with obs-websocket v5.5.0+ plugin (for chapter creation support)
 - **WebSocket Server** enabled in OBS (Tools → WebSocket Server Settings)
 - Default connection: `obsws://localhost:4455` with password `secret`
 
@@ -309,6 +313,7 @@ obs-cmd info
 - **Connection refused**: Ensure OBS WebSocket server is running
 - **Authentication failed**: Check password in OBS WebSocket settings
 - **Invalid URL format**: Use `obsws://hostname:port/password` format
+- **Chapter creation failed**: Ensure recording is active and using Hybrid MP4 format
 
 ### Debug Mode
 Set environment variable for verbose output:

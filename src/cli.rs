@@ -99,6 +99,10 @@ pub enum Recording {
     Pause,
     Resume,
     TogglePause,
+    CreateChapter {
+        /// Name of the new chapter (optional)
+        chapter_name: Option<String>,
+    },
 }
 
 #[derive(Subcommand, Clone, Debug)]

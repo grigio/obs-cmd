@@ -94,6 +94,30 @@ impl CommandHandler for RecordingHandler {
                     .map_err(|e| ObsCmdError::ConnectionError(e))?;
                 println!("Recording pause toggled successfully");
             }
+            Recording::CreateChapter { chapter_name } => {
+                // Check if recording is active first
+                let status = client
+                    .recording()
+                    .status()
+                    .await
+                    .map_err(|e| ObsCmdError::ConnectionError(e))?;
+
+                if !status.active {
+                    return Err(ObsCmdError::RecordingNotActive);
+                }
+
+                println!("Creating record chapter...");
+                client
+                    .recording()
+                    .create_chapter(chapter_name.as_deref())
+                    .await
+                    .map_err(|e| ObsCmdError::ConnectionError(e))?;
+
+                match chapter_name {
+                    Some(name) => println!("Chapter '{}' created successfully", name),
+                    None => println!("Chapter created successfully"),
+                }
+            }
         };
         Ok(())
     }
@@ -108,6 +132,7 @@ impl CommandHandler for RecordingHandler {
             Recording::Pause => "Pause recording",
             Recording::Resume => "Resume recording",
             Recording::TogglePause => "Toggle recording pause",
+            Recording::CreateChapter { .. } => "Create a record chapter",
         }
     }
 }

@@ -58,7 +58,14 @@ src/
 - Custom URL parsing for `obws://hostname:port/password` format in `src/cli.rs`
 - Subcommand structure for logical grouping (scenes, recording, streaming, config, etc.)
 - Duration parsing for media controls in `src/cli.rs`
+- Recording chapter creation with optional naming support
 - Config management commands for profiles, video settings, stream service, and record directory
+
+### Recording Control
+- Start, stop, toggle recording with status monitoring
+- Pause, resume recording functionality
+- Recording status queries and validation
+- Chapter creation support for Hybrid MP4 recordings (OBS 30.0+, WebSocket v5.5.0+)
 
 ### Config Management Features
 - **Profile Management**: List, create, remove, switch between OBS profiles

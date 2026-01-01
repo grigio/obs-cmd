@@ -649,6 +649,43 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn test_recording_create_chapter_command_with_name() {
+        let chapter_name = Some("Test Chapter".to_string());
+        let command = Commands::Recording(Recording::CreateChapter {
+            chapter_name: chapter_name.clone(),
+        });
+
+        match command {
+            Commands::Recording(Recording::CreateChapter { chapter_name: name }) => {
+                assert_eq!(name, chapter_name);
+            }
+            _ => panic!("Expected Recording::CreateChapter command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_recording_create_chapter_command_without_name() {
+        let command = Commands::Recording(Recording::CreateChapter { chapter_name: None });
+
+        match command {
+            Commands::Recording(Recording::CreateChapter { chapter_name }) => {
+                assert_eq!(chapter_name, None);
+            }
+            _ => panic!("Expected Recording::CreateChapter command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_recording_create_chapter_handler_description() {
+        let handler = RecordingHandler {
+            action: Recording::CreateChapter {
+                chapter_name: Some("Test Chapter".to_string()),
+            },
+        };
+        assert_eq!(handler.description(), "Create a record chapter");
+    }
+
+    #[tokio::test]
     async fn test_streaming_handler_description() {
         let handler = StreamingHandler {
             action: Streaming::Toggle,

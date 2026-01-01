@@ -59,6 +59,29 @@ jobs:
   #         fail_ci_if_error: false
   #         token: ${{ secrets.CODECOV_TOKEN }}
 
+  freebsd:
+    name: FreeBSD 15.0 Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test in FreeBSD 15.0
+        uses: vmactions/freebsd-vm@v1
+        with:
+          release: '15.0'
+          usesh: true
+          prepare: |
+            pkg update -f
+            pkg install -y rust
+          run: |
+            rustc --version
+            cargo --version
+            pwd
+            ls -lah
+            cargo fmt --all -- --check
+            cargo clippy --all-targets --all-features -- -D warnings
+            cargo build --verbose
+            cargo test --verbose
+
   performance:
     name: Performance Tests
     runs-on: ubuntu-latest

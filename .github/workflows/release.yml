@@ -101,7 +101,7 @@ jobs:
         run: |
           cargo build --release --target ${{ matrix.target }}
           
-      - name: Build release binary (FreeBSD)
+- name: Build and create release archive (FreeBSD)
         if: matrix.os == 'freebsd'
         uses: vmactions/freebsd-vm@v1
         with:
@@ -112,28 +112,18 @@ jobs:
             pkg install -y rust
           run: |
             cargo build --release --target ${{ matrix.target }}
-          
+            mkdir -p release
+            cp target/${{ matrix.target }}/release/obs-cmd release/
+            strip release/obs-cmd || true
+            tar -czf obs-cmd-${{ matrix.arch }}-${{ matrix.os }}.tar.gz -C release obs-cmd
+            
       - name: Create release archive (Unix)
-        if: matrix.os != 'windows'
+        if: matrix.os != 'windows' && matrix.os != 'freebsd'
         run: |
           mkdir -p release
           cp target/${{ matrix.target }}/release/obs-cmd${{ matrix.os == 'windows' && '.exe' || '' }} release/
           strip release/obs-cmd${{ matrix.os == 'windows' && '.exe' || '' }} || true
           tar -czf obs-cmd-${{ matrix.arch }}-${{ matrix.os }}.tar.gz -C release obs-cmd${{ matrix.os == 'windows' && '.exe' || '' }}
-          
-      - name: Create release archive (FreeBSD)
-        if: matrix.os == 'freebsd'
-        uses: vmactions/freebsd-vm@v1
-        with:
-          release: '15.0'
-          usesh: true
-          prepare: |
-            pkg install -y rust
-          run: |
-            mkdir -p release
-            cp target/${{ matrix.target }}/release/obs-cmd release/
-            strip release/obs-cmd || true
-            tar -czf obs-cmd-${{ matrix.arch }}-${{ matrix.os }}.tar.gz -C release obs-cmd
             
       - name: Create release archive (Windows)
         if: matrix.os == 'windows'

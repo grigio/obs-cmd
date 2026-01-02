@@ -88,8 +88,6 @@ jobs:
           cargo install cargo-audit --quiet
           cargo audit
           
-
-          
       - name: Cache cargo registry
         if: matrix.os != 'freebsd'
         uses: actions/cache@v4

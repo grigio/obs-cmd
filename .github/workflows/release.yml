@@ -101,7 +101,7 @@ jobs:
         run: |
           cargo build --release --target ${{ matrix.target }}
           
-- name: Build and create release archive (FreeBSD)
+      - name: Build and create release archive (FreeBSD)
         if: matrix.os == 'freebsd'
         uses: vmactions/freebsd-vm@v1
         with:

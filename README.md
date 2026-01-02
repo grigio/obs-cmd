@@ -2,7 +2,8 @@
 
 **obs-cmd** is a lightweight, command-line interface for controlling OBS Studio via the obs-websocket v5 protocol. It provides a simple and efficient way to automate your streaming and recording workflows.
 
-[![Release](https://github.com/grigio/obs-cmd/actions/workflows/release.yml/badge.svg)](https://github.com/grigio/obs-cmd/actions/workflows/release.yml)
+[![Latest version](https://img.shields.io/github/release/grigio/obs-cmd.svg)](https://github.com/grigio/obs-cmd/releases/latest)
+[![Release](https://github.com/grigio/obs-cmd/workflows/Release/badge.svg)](https://github.com/grigio/obs-cmd/releases)
 [![Dependencies status](https://deps.rs/repo/github/grigio/obs-cmd/status.svg)](https://deps.rs/repo/github/grigio/obs-cmd)
 
 ## Features

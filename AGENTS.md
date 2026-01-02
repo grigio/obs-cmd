@@ -31,9 +31,11 @@ src/
     ├── streaming.rs     # Streaming control
     ├── audio.rs         # Audio source management
     ├── filters.rs       # Filter management
+    ├── inputs.rs        # Input management (CRUD, settings, audio controls)
     ├── media.rs         # Media input control
     ├── sources.rs       # Source screenshots
     ├── ui.rs            # Projector management
+    ├── scene_collections.rs # Scene collection management
     └── ...              # Other specialized handlers
 ```
 
@@ -66,6 +68,13 @@ src/
 - Pause, resume recording functionality
 - Recording status queries and validation
 - Chapter creation support for Hybrid MP4 recordings (OBS 30.0+, WebSocket v5.5.0+)
+
+### Input Management Features
+- **CRUD Operations**: List, create, remove, rename inputs
+- **Input Settings**: Get/set input configurations and default settings
+- **Audio Controls**: Volume, mute/unmute/toggle, balance, sync offset
+- **Advanced Audio**: Monitor type configuration, audio track management
+- **Input Discovery**: List input kinds and special inputs
 
 ### Config Management Features
 - **Profile Management**: List, create, remove, switch between OBS profiles

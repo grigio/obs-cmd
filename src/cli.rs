@@ -384,6 +384,9 @@ pub enum Commands {
     #[clap(subcommand)]
     MediaInput(MediaInput),
 
+    #[clap(subcommand)]
+    Input(Input),
+
     /// Generate shell completion scripts
     Completion {
         /// Shell type to generate completion for
@@ -425,6 +428,130 @@ pub enum MediaInput {
         /// The name of media input
         name: String,
     },
+}
+
+#[derive(Subcommand, Clone, Debug, PartialEq)]
+pub enum Input {
+    /// List all inputs, optionally filtered by kind
+    List {
+        /// Filter by input kind (e.g., "ffmpeg_source", "image_source")
+        kind: Option<String>,
+    },
+    /// List all available input kinds
+    ListKinds,
+    /// Create a new input
+    Create {
+        /// Name for the new input
+        input_name: String,
+        /// Kind of input to create (e.g., "ffmpeg_source", "image_source")
+        input_kind: String,
+        /// Scene to add input to (optional)
+        #[clap(long)]
+        scene: Option<String>,
+        /// Input settings as JSON string (optional)
+        #[clap(long)]
+        settings: Option<String>,
+    },
+    /// Remove an input
+    Remove {
+        /// Name of input to remove
+        input_name: String,
+    },
+    /// Rename an input
+    Rename {
+        /// Current name of input
+        input_name: String,
+        /// New name for input
+        new_name: String,
+    },
+    /// Get or set input settings
+    Settings {
+        /// Name of input
+        input_name: String,
+        /// Get current settings
+        #[clap(long)]
+        get: bool,
+        /// Set new settings as JSON string
+        #[clap(long)]
+        set: Option<String>,
+    },
+    /// Get or set input volume
+    Volume {
+        /// Name of input
+        input_name: String,
+        /// Get current volume
+        #[clap(long)]
+        get: bool,
+        /// Set volume (0.0 to 1.0)
+        #[clap(long)]
+        set: Option<f64>,
+    },
+    /// Mute control for input
+    Mute {
+        /// Name of input
+        input_name: String,
+        #[clap(subcommand)]
+        action: MuteAction,
+    },
+    /// Get or set audio balance
+    AudioBalance {
+        /// Name of input
+        input_name: String,
+        /// Get current balance
+        #[clap(long)]
+        get: bool,
+        /// Set balance (-1.0 to 1.0)
+        #[clap(long)]
+        set: Option<f32>,
+    },
+    /// Get or set audio sync offset
+    AudioSyncOffset {
+        /// Name of input
+        input_name: String,
+        /// Get current sync offset
+        #[clap(long)]
+        get: bool,
+        /// Set sync offset in nanoseconds
+        #[clap(long)]
+        set: Option<i64>,
+    },
+    /// Get or set audio monitor type
+    AudioMonitorType {
+        /// Name of input
+        input_name: String,
+        /// Get current monitor type
+        #[clap(long)]
+        get: bool,
+        /// Set monitor type (none, monitorOnly, both)
+        #[clap(long)]
+        set: Option<String>,
+    },
+    /// Get or set audio tracks
+    AudioTracks {
+        /// Name of input
+        input_name: String,
+        /// Get current audio tracks
+        #[clap(long)]
+        get: bool,
+        /// Set audio tracks as JSON
+        #[clap(long)]
+        set: Option<String>,
+    },
+    /// Get default settings for input kind
+    DefaultSettings {
+        /// Input kind to get default settings for
+        input_kind: String,
+    },
+    /// Get special inputs
+    Specials,
+}
+
+#[derive(Subcommand, Clone, Debug, PartialEq)]
+pub enum MuteAction {
+    Mute,
+    Unmute,
+    Toggle,
+    Status,
 }
 
 /// Parses duration strings in [hh:]mm:ss format.

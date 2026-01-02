@@ -1,8 +1,8 @@
 #[cfg(test)]
 mod tests {
     use crate::cli::{
-        Commands, MediaInput, Recording, Replay, Scene, SceneCollection, SceneItem, Streaming,
-        VirtualCamera,
+        Commands, Input, MediaInput, MuteAction, Recording, Replay, Scene, SceneCollection,
+        SceneItem, Streaming, VirtualCamera,
     };
     use crate::handlers::{
         audio::AudioHandler, filters::FilterHandler, general::HotkeyHandler, general::InfoHandler,
@@ -870,6 +870,651 @@ mod tests {
 
         let result = validate_monitor_index(&monitors, 2);
         assert!(result.is_err());
+    }
+
+    // Input command tests
+    #[tokio::test]
+    async fn test_input_list_command() {
+        let command = Commands::Input(Input::List { kind: None });
+
+        match command {
+            Commands::Input(Input::List { kind }) => {
+                assert_eq!(kind, None);
+            }
+            _ => panic!("Expected Input::List command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_input_list_with_kind_command() {
+        let command = Commands::Input(Input::List {
+            kind: Some("ffmpeg_source".to_string()),
+        });
+
+        match command {
+            Commands::Input(Input::List { kind }) => {
+                assert_eq!(kind, Some("ffmpeg_source".to_string()));
+            }
+            _ => panic!("Expected Input::List command with kind"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_input_list_kinds_command() {
+        let command = Commands::Input(Input::ListKinds);
+
+        match command {
+            Commands::Input(Input::ListKinds) => {
+                // Test passes if pattern matches
+            }
+            _ => panic!("Expected Input::ListKinds command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_input_create_command() {
+        let command = Commands::Input(Input::Create {
+            input_name: "test_input".to_string(),
+            input_kind: "ffmpeg_source".to_string(),
+            scene: None,
+            settings: None,
+        });
+
+        match command {
+            Commands::Input(Input::Create {
+                input_name,
+                input_kind,
+                scene,
+                settings,
+            }) => {
+                assert_eq!(input_name, "test_input");
+                assert_eq!(input_kind, "ffmpeg_source");
+                assert_eq!(scene, None);
+                assert_eq!(settings, None);
+            }
+            _ => panic!("Expected Input::Create command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_input_create_with_scene_and_settings_command() {
+        let command = Commands::Input(Input::Create {
+            input_name: "test_input".to_string(),
+            input_kind: "image_source".to_string(),
+            scene: Some("Main Scene".to_string()),
+            settings: Some(r#"{"file": "/path/to/image.png"}"#.to_string()),
+        });
+
+        match command {
+            Commands::Input(Input::Create {
+                input_name,
+                input_kind,
+                scene,
+                settings,
+            }) => {
+                assert_eq!(input_name, "test_input");
+                assert_eq!(input_kind, "image_source");
+                assert_eq!(scene, Some("Main Scene".to_string()));
+                assert_eq!(
+                    settings,
+                    Some(r#"{"file": "/path/to/image.png"}"#.to_string())
+                );
+            }
+            _ => panic!("Expected Input::Create command with scene and settings"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_input_remove_command() {
+        let command = Commands::Input(Input::Remove {
+            input_name: "old_input".to_string(),
+        });
+
+        match command {
+            Commands::Input(Input::Remove { input_name }) => {
+                assert_eq!(input_name, "old_input");
+            }
+            _ => panic!("Expected Input::Remove command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_input_rename_command() {
+        let command = Commands::Input(Input::Rename {
+            input_name: "old_name".to_string(),
+            new_name: "new_name".to_string(),
+        });
+
+        match command {
+            Commands::Input(Input::Rename {
+                input_name,
+                new_name,
+            }) => {
+                assert_eq!(input_name, "old_name");
+                assert_eq!(new_name, "new_name");
+            }
+            _ => panic!("Expected Input::Rename command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_input_settings_get_command() {
+        let command = Commands::Input(Input::Settings {
+            input_name: "test_input".to_string(),
+            get: true,
+            set: None,
+        });
+
+        match command {
+            Commands::Input(Input::Settings {
+                input_name,
+                get,
+                set,
+            }) => {
+                assert_eq!(input_name, "test_input");
+                assert!(get);
+                assert_eq!(set, None);
+            }
+            _ => panic!("Expected Input::Settings get command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_input_settings_set_command() {
+        let command = Commands::Input(Input::Settings {
+            input_name: "test_input".to_string(),
+            get: false,
+            set: Some(r#"{"key": "value"}"#.to_string()),
+        });
+
+        match command {
+            Commands::Input(Input::Settings {
+                input_name,
+                get,
+                set,
+            }) => {
+                assert_eq!(input_name, "test_input");
+                assert!(!get);
+                assert_eq!(set, Some(r#"{"key": "value"}"#.to_string()));
+            }
+            _ => panic!("Expected Input::Settings set command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_input_volume_get_command() {
+        let command = Commands::Input(Input::Volume {
+            input_name: "test_input".to_string(),
+            get: true,
+            set: None,
+        });
+
+        match command {
+            Commands::Input(Input::Volume {
+                input_name,
+                get,
+                set,
+            }) => {
+                assert_eq!(input_name, "test_input");
+                assert!(get);
+                assert_eq!(set, None);
+            }
+            _ => panic!("Expected Input::Volume get command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_input_volume_set_command() {
+        let command = Commands::Input(Input::Volume {
+            input_name: "test_input".to_string(),
+            get: false,
+            set: Some(0.75),
+        });
+
+        match command {
+            Commands::Input(Input::Volume {
+                input_name,
+                get,
+                set,
+            }) => {
+                assert_eq!(input_name, "test_input");
+                assert!(!get);
+                assert_eq!(set, Some(0.75));
+            }
+            _ => panic!("Expected Input::Volume set command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_input_mute_mute_command() {
+        let command = Commands::Input(Input::Mute {
+            input_name: "test_input".to_string(),
+            action: MuteAction::Mute,
+        });
+
+        match command {
+            Commands::Input(Input::Mute { input_name, action }) => {
+                assert_eq!(input_name, "test_input");
+                assert_eq!(action, MuteAction::Mute);
+            }
+            _ => panic!("Expected Input::Mute mute command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_input_mute_unmute_command() {
+        let command = Commands::Input(Input::Mute {
+            input_name: "test_input".to_string(),
+            action: MuteAction::Unmute,
+        });
+
+        match command {
+            Commands::Input(Input::Mute { input_name, action }) => {
+                assert_eq!(input_name, "test_input");
+                assert_eq!(action, MuteAction::Unmute);
+            }
+            _ => panic!("Expected Input::Mute unmute command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_input_mute_toggle_command() {
+        let command = Commands::Input(Input::Mute {
+            input_name: "test_input".to_string(),
+            action: MuteAction::Toggle,
+        });
+
+        match command {
+            Commands::Input(Input::Mute { input_name, action }) => {
+                assert_eq!(input_name, "test_input");
+                assert_eq!(action, MuteAction::Toggle);
+            }
+            _ => panic!("Expected Input::Mute toggle command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_input_mute_status_command() {
+        let command = Commands::Input(Input::Mute {
+            input_name: "test_input".to_string(),
+            action: MuteAction::Status,
+        });
+
+        match command {
+            Commands::Input(Input::Mute { input_name, action }) => {
+                assert_eq!(input_name, "test_input");
+                assert_eq!(action, MuteAction::Status);
+            }
+            _ => panic!("Expected Input::Mute status command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_input_audio_balance_get_command() {
+        let command = Commands::Input(Input::AudioBalance {
+            input_name: "test_input".to_string(),
+            get: true,
+            set: None,
+        });
+
+        match command {
+            Commands::Input(Input::AudioBalance {
+                input_name,
+                get,
+                set,
+            }) => {
+                assert_eq!(input_name, "test_input");
+                assert!(get);
+                assert_eq!(set, None);
+            }
+            _ => panic!("Expected Input::AudioBalance get command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_input_audio_balance_set_command() {
+        let command = Commands::Input(Input::AudioBalance {
+            input_name: "test_input".to_string(),
+            get: false,
+            set: Some(0.5),
+        });
+
+        match command {
+            Commands::Input(Input::AudioBalance {
+                input_name,
+                get,
+                set,
+            }) => {
+                assert_eq!(input_name, "test_input");
+                assert!(!get);
+                assert_eq!(set, Some(0.5));
+            }
+            _ => panic!("Expected Input::AudioBalance set command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_input_audio_sync_offset_get_command() {
+        let command = Commands::Input(Input::AudioSyncOffset {
+            input_name: "test_input".to_string(),
+            get: true,
+            set: None,
+        });
+
+        match command {
+            Commands::Input(Input::AudioSyncOffset {
+                input_name,
+                get,
+                set,
+            }) => {
+                assert_eq!(input_name, "test_input");
+                assert!(get);
+                assert_eq!(set, None);
+            }
+            _ => panic!("Expected Input::AudioSyncOffset get command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_input_audio_sync_offset_set_command() {
+        let command = Commands::Input(Input::AudioSyncOffset {
+            input_name: "test_input".to_string(),
+            get: false,
+            set: Some(1000000),
+        });
+
+        match command {
+            Commands::Input(Input::AudioSyncOffset {
+                input_name,
+                get,
+                set,
+            }) => {
+                assert_eq!(input_name, "test_input");
+                assert!(!get);
+                assert_eq!(set, Some(1000000));
+            }
+            _ => panic!("Expected Input::AudioSyncOffset set command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_input_audio_monitor_type_get_command() {
+        let command = Commands::Input(Input::AudioMonitorType {
+            input_name: "test_input".to_string(),
+            get: true,
+            set: None,
+        });
+
+        match command {
+            Commands::Input(Input::AudioMonitorType {
+                input_name,
+                get,
+                set,
+            }) => {
+                assert_eq!(input_name, "test_input");
+                assert!(get);
+                assert_eq!(set, None);
+            }
+            _ => panic!("Expected Input::AudioMonitorType get command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_input_audio_monitor_type_set_command() {
+        let command = Commands::Input(Input::AudioMonitorType {
+            input_name: "test_input".to_string(),
+            get: false,
+            set: Some("monitorOnly".to_string()),
+        });
+
+        match command {
+            Commands::Input(Input::AudioMonitorType {
+                input_name,
+                get,
+                set,
+            }) => {
+                assert_eq!(input_name, "test_input");
+                assert!(!get);
+                assert_eq!(set, Some("monitorOnly".to_string()));
+            }
+            _ => panic!("Expected Input::AudioMonitorType set command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_input_audio_tracks_get_command() {
+        let command = Commands::Input(Input::AudioTracks {
+            input_name: "test_input".to_string(),
+            get: true,
+            set: None,
+        });
+
+        match command {
+            Commands::Input(Input::AudioTracks {
+                input_name,
+                get,
+                set,
+            }) => {
+                assert_eq!(input_name, "test_input");
+                assert!(get);
+                assert_eq!(set, None);
+            }
+            _ => panic!("Expected Input::AudioTracks get command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_input_audio_tracks_set_command() {
+        let command = Commands::Input(Input::AudioTracks {
+            input_name: "test_input".to_string(),
+            get: false,
+            set: Some(r#"{"1": true, "2": false}"#.to_string()),
+        });
+
+        match command {
+            Commands::Input(Input::AudioTracks {
+                input_name,
+                get,
+                set,
+            }) => {
+                assert_eq!(input_name, "test_input");
+                assert!(!get);
+                assert_eq!(set, Some(r#"{"1": true, "2": false}"#.to_string()));
+            }
+            _ => panic!("Expected Input::AudioTracks set command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_input_default_settings_command() {
+        let command = Commands::Input(Input::DefaultSettings {
+            input_kind: "ffmpeg_source".to_string(),
+        });
+
+        match command {
+            Commands::Input(Input::DefaultSettings { input_kind }) => {
+                assert_eq!(input_kind, "ffmpeg_source");
+            }
+            _ => panic!("Expected Input::DefaultSettings command"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_input_specials_command() {
+        let command = Commands::Input(Input::Specials);
+
+        match command {
+            Commands::Input(Input::Specials) => {
+                // Test passes if pattern matches
+            }
+            _ => panic!("Expected Input::Specials command"),
+        }
+    }
+
+    // Input handler description tests
+    #[tokio::test]
+    async fn test_input_handler_description_list() {
+        use crate::handlers::inputs::InputCmdHandler;
+        let handler = InputCmdHandler {
+            action: Input::List { kind: None },
+        };
+        assert_eq!(handler.description(), "List inputs");
+    }
+
+    #[tokio::test]
+    async fn test_input_handler_description_list_kinds() {
+        use crate::handlers::inputs::InputCmdHandler;
+        let handler = InputCmdHandler {
+            action: Input::ListKinds,
+        };
+        assert_eq!(handler.description(), "List available input kinds");
+    }
+
+    #[tokio::test]
+    async fn test_input_handler_description_create() {
+        use crate::handlers::inputs::InputCmdHandler;
+        let handler = InputCmdHandler {
+            action: Input::Create {
+                input_name: "test".to_string(),
+                input_kind: "ffmpeg_source".to_string(),
+                scene: None,
+                settings: None,
+            },
+        };
+        assert_eq!(handler.description(), "Create new input");
+    }
+
+    #[tokio::test]
+    async fn test_input_handler_description_remove() {
+        use crate::handlers::inputs::InputCmdHandler;
+        let handler = InputCmdHandler {
+            action: Input::Remove {
+                input_name: "test".to_string(),
+            },
+        };
+        assert_eq!(handler.description(), "Remove input");
+    }
+
+    #[tokio::test]
+    async fn test_input_handler_description_rename() {
+        use crate::handlers::inputs::InputCmdHandler;
+        let handler = InputCmdHandler {
+            action: Input::Rename {
+                input_name: "old".to_string(),
+                new_name: "new".to_string(),
+            },
+        };
+        assert_eq!(handler.description(), "Rename input");
+    }
+
+    #[tokio::test]
+    async fn test_input_handler_description_settings() {
+        use crate::handlers::inputs::InputCmdHandler;
+        let handler = InputCmdHandler {
+            action: Input::Settings {
+                input_name: "test".to_string(),
+                get: true,
+                set: None,
+            },
+        };
+        assert_eq!(handler.description(), "Manage input settings");
+    }
+
+    #[tokio::test]
+    async fn test_input_handler_description_volume() {
+        use crate::handlers::inputs::InputCmdHandler;
+        let handler = InputCmdHandler {
+            action: Input::Volume {
+                input_name: "test".to_string(),
+                get: false,
+                set: Some(0.5),
+            },
+        };
+        assert_eq!(handler.description(), "Manage input volume");
+    }
+
+    #[tokio::test]
+    async fn test_input_handler_description_mute() {
+        use crate::handlers::inputs::InputCmdHandler;
+        let handler = InputCmdHandler {
+            action: Input::Mute {
+                input_name: "test".to_string(),
+                action: MuteAction::Toggle,
+            },
+        };
+        assert_eq!(handler.description(), "Manage input mute state");
+    }
+
+    #[tokio::test]
+    async fn test_input_handler_description_audio_balance() {
+        use crate::handlers::inputs::InputCmdHandler;
+        let handler = InputCmdHandler {
+            action: Input::AudioBalance {
+                input_name: "test".to_string(),
+                get: true,
+                set: None,
+            },
+        };
+        assert_eq!(handler.description(), "Manage audio balance");
+    }
+
+    #[tokio::test]
+    async fn test_input_handler_description_audio_sync_offset() {
+        use crate::handlers::inputs::InputCmdHandler;
+        let handler = InputCmdHandler {
+            action: Input::AudioSyncOffset {
+                input_name: "test".to_string(),
+                get: false,
+                set: Some(1000),
+            },
+        };
+        assert_eq!(handler.description(), "Manage audio sync offset");
+    }
+
+    #[tokio::test]
+    async fn test_input_handler_description_audio_monitor_type() {
+        use crate::handlers::inputs::InputCmdHandler;
+        let handler = InputCmdHandler {
+            action: Input::AudioMonitorType {
+                input_name: "test".to_string(),
+                get: true,
+                set: None,
+            },
+        };
+        assert_eq!(handler.description(), "Manage audio monitor type");
+    }
+
+    #[tokio::test]
+    async fn test_input_handler_description_audio_tracks() {
+        use crate::handlers::inputs::InputCmdHandler;
+        let handler = InputCmdHandler {
+            action: Input::AudioTracks {
+                input_name: "test".to_string(),
+                get: false,
+                set: Some(r#"{"1": true}"#.to_string()),
+            },
+        };
+        assert_eq!(handler.description(), "Manage audio tracks");
+    }
+
+    #[tokio::test]
+    async fn test_input_handler_description_default_settings() {
+        use crate::handlers::inputs::InputCmdHandler;
+        let handler = InputCmdHandler {
+            action: Input::DefaultSettings {
+                input_kind: "ffmpeg_source".to_string(),
+            },
+        };
+        assert_eq!(handler.description(), "Get default settings for input kind");
+    }
+
+    #[tokio::test]
+    async fn test_input_handler_description_specials() {
+        use crate::handlers::inputs::InputCmdHandler;
+        let handler = InputCmdHandler {
+            action: Input::Specials,
+        };
+        assert_eq!(handler.description(), "List special inputs");
     }
 
     // Integration tests would go here in a real implementation

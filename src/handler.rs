@@ -4,8 +4,8 @@ use crate::error::Result;
 use crate::handlers::{
     audio::AudioHandler, config::ProfileHandler, config::RecordDirectoryHandler,
     config::StreamServiceHandler, config::VideoSettingsHandler, filters::FilterHandler,
-    general::HotkeyHandler, general::InfoHandler, media::MediaInputHandler,
-    recording::RecordingHandler, replay_buffer::ReplayBufferHandler,
+    general::HotkeyHandler, general::InfoHandler, inputs::InputCmdHandler,
+    media::MediaInputHandler, recording::RecordingHandler, replay_buffer::ReplayBufferHandler,
     scene_collections::SceneCollectionHandler, scene_items::SceneItemHandler, scenes::SceneHandler,
     sources::SourceHandler, streaming::StreamingHandler, ui::FullscreenProjectorHandler,
     ui::SourceProjectorHandler, virtual_camera::VirtualCameraHandler, CommandHandler,
@@ -29,6 +29,11 @@ pub async fn handle_commands(client: &Client, commands: &Commands) -> Result<()>
         Commands::MediaInput(media_input) => Box::new(MediaInputHandler {
             action: media_input.clone(),
         }),
+
+        Commands::Input(action) => Box::new(InputCmdHandler {
+            action: action.clone(),
+        }),
+
         Commands::Scene(action) => Box::new(SceneHandler {
             action: action.clone(),
         }),

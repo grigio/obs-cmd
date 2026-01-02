@@ -14,6 +14,12 @@
 - **Virtual Camera**: Start, stop, toggle virtual camera output
 - **Replay Buffer**: Manage replay buffer with save functionality and status tracking
 - **Media Inputs**: Full media control with play, pause, stop, restart, and seek capabilities
+- **Input Management**: Complete CRUD operations for inputs, settings management, and audio control
+  - List inputs and available input kinds
+  - Create, remove, rename, and manage input settings
+  - Audio controls: volume, mute/unmute/toggle, balance, sync offset, monitor type, tracks
+  - Get default settings for any input kind
+  - List special inputs (desktop audio, microphones)
 - **Screenshots**: Capture source screenshots with custom dimensions and compression
 - **Hotkeys**: Trigger any OBS hotkey by name
 - **Projectors**: Open fullscreen and source-specific projectors on multiple monitors

@@ -48,6 +48,17 @@ pub enum ObsCmdError {
 
     #[error("Invalid WebSocket URL format: {0}. Expected format: obsws://hostname:port/password")]
     WebSocketUrlParseError(String),
+
+    #[error("Invalid volume value {volume}. Must be between 0.0 and 1.0")]
+    InvalidVolume { volume: f64 },
+
+    #[error("Invalid audio balance {balance}. Must be between -1.0 and 1.0")]
+    InvalidAudioBalance { balance: f32 },
+
+    #[error(
+        "Invalid audio monitor type '{monitor_type}'. Valid types are: none, monitorOnly, both"
+    )]
+    InvalidAudioMonitorType { monitor_type: String },
 }
 
 /// Result type alias for obs-cmd operations.

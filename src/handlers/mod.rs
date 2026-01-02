@@ -3,6 +3,7 @@ pub mod config;
 pub mod filters;
 pub mod general;
 pub mod handler_tests;
+pub mod inputs;
 pub mod media;
 pub mod recording;
 pub mod replay_buffer;

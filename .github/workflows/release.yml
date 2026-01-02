@@ -124,32 +124,32 @@ jobs:
             mkdir -p release
             cp target/${{ matrix.target }}/release/obs-cmd release/
             strip release/obs-cmd || true
-            tar -czf obs-cmd-${{ matrix.arch }}-${{ matrix.os }}.tar.gz -C release obs-cmd
-            
-       - name: Create release archive (Unix)
-         if: matrix.os != 'windows' && matrix.os != 'freebsd'
-         run: |
-           mkdir -p release
-           cp target/${{ matrix.target }}/release/obs-cmd release/
-           strip release/obs-cmd || true
-           tar -czf obs-cmd-${{ matrix.arch }}-${{ matrix.os }}.tar.gz -C release obs-cmd
-              
-       - name: Create release archive (Windows)
-         if: matrix.os == 'windows'
-         run: |
-           mkdir -p release
-           copy target\${{ matrix.target }}\release\obs-cmd.exe release\
-           tar -czf obs-cmd-${{ matrix.arch }}-${{ matrix.os }}.tar.gz -C release obs-cmd.exe
+             tar -czf obs-cmd-${{ matrix.arch }}-${{ matrix.os }}.tar.gz -C release obs-cmd
+             
+      - name: Create release archive (Unix)
+        if: matrix.os != 'windows' && matrix.os != 'freebsd'
+        run: |
+          mkdir -p release
+          cp target/${{ matrix.target }}/release/obs-cmd release/
+          strip release/obs-cmd || true
+          tar -czf obs-cmd-${{ matrix.arch }}-${{ matrix.os }}.tar.gz -C release obs-cmd
+             
+      - name: Create release archive (Windows)
+        if: matrix.os == 'windows'
+        run: |
+          mkdir -p release
+          copy target\${{ matrix.target }}\release\obs-cmd.exe release\
+          tar -czf obs-cmd-${{ matrix.arch }}-${{ matrix.os }}.tar.gz -C release obs-cmd.exe
+         
+      - name: Generate checksum
+        run: |
+          sha256sum obs-cmd-${{ matrix.arch }}-${{ matrix.os }}.tar.gz > obs-cmd-${{ matrix.arch }}-${{ matrix.os }}.tar.gz.sha256
           
-       - name: Generate checksum
-         run: |
-           sha256sum obs-cmd-${{ matrix.arch }}-${{ matrix.os }}.tar.gz > obs-cmd-${{ matrix.arch }}-${{ matrix.os }}.tar.gz.sha256
-            
-       - name: Upload release asset
-         uses: softprops/action-gh-release@v1
-         env:
-           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-         with:
-           files: |
-             ./obs-cmd-${{ matrix.arch }}-${{ matrix.os }}.tar.gz
-             ./obs-cmd-${{ matrix.arch }}-${{ matrix.os }}.tar.gz.sha256
+      - name: Upload release asset
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: |
+            ./obs-cmd-${{ matrix.arch }}-${{ matrix.os }}.tar.gz
+            ./obs-cmd-${{ matrix.arch }}-${{ matrix.os }}.tar.gz.sha256

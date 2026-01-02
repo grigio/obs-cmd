@@ -1,4 +1,4 @@
-name: Rust
+name: CI
 
 on:
   push:
@@ -14,6 +14,7 @@ jobs:
     strategy:
       matrix:
         platform: [ubuntu-latest, macos-latest, windows-latest]
+      fail-fast: false
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
@@ -83,8 +84,7 @@ jobs:
             export OPENSSL_DIR=/usr/local
             export OPENSSL_LIB_DIR=/usr/local/lib
             export OPENSSL_INCLUDE_DIR=/usr/local/include
-            cargo fmt --all -- --check
-            cargo clippy --all-targets --all-features -- -D warnings
+            # Build and test only (fmt/clippy already done in main test job)
             cargo build --verbose
             cargo test --verbose
 

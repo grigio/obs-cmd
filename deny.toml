@@ -9,10 +9,31 @@ allow = [
 ]
 
 [bans]
-multiple-versions = "warn"
+multiple-versions = "deny"
 wildcards = "allow"
+deny = [
+    # Common duplicates that should be avoided
+    { name = "log", use-installed-if-available = true },
+    { name = "serde", use-installed-if-available = true },
+    { name = "tokio", use-installed-if-available = true },
+]
 skip = [
     { name = "windows-sys", version = ">=0.52.0,<1.0.0" },
+    # Allow known acceptable duplicates for CLI tools
+    { name = "hashbrown" },
+    { name = "itertools" },
+    { name = "smallvec" },
+    { name = "unicode-width" },
+    { name = "syn" },
+    { name = "quote" },
+    { name = "proc-macro2" },
+    { name = "indexmap" },
+    { name = "cfg-expr" },
+    { name = "parking_lot" },
+    { name = "tracing" },
+    { name = "futures" },
+    { name = "bytes" },
+    { name = "bitflags" },
 ]
 
 [sources]

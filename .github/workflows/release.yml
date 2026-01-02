@@ -133,7 +133,7 @@ jobs:
            cp target/${{ matrix.target }}/release/obs-cmd release/
            strip release/obs-cmd || true
            tar -czf obs-cmd-${{ matrix.arch }}-${{ matrix.os }}.tar.gz -C release obs-cmd
-             
+              
        - name: Create release archive (Windows)
          if: matrix.os == 'windows'
          run: |
@@ -144,7 +144,7 @@ jobs:
        - name: Generate checksum
          run: |
            sha256sum obs-cmd-${{ matrix.arch }}-${{ matrix.os }}.tar.gz > obs-cmd-${{ matrix.arch }}-${{ matrix.os }}.tar.gz.sha256
-           
+            
        - name: Upload release asset
          uses: softprops/action-gh-release@v1
          env:

@@ -166,4 +166,4 @@ jobs:
       - name: Build package
         run: nix build
       - name: Test dev shell
-        run: nix develop --run "cargo test"
+        run: nix develop -c cargo test

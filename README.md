@@ -326,6 +326,8 @@ RUST_LOG=debug obs-cmd info
 
 ## Development
 
+### Traditional Rust Development
+
 ```bash
 # Build from source
 cargo build --release
@@ -339,6 +341,35 @@ cargo fmt
 # Lint code
 cargo clippy -- -D warnings
 ```
+
+### Nix Support
+
+This project supports Nix for reproducible builds and development environments.
+
+#### Development with Nix
+
+1. **Enter development shell**:
+   ```bash
+   nix develop
+   ```
+
+2. **Build project**:
+   ```bash
+   nix build
+   ```
+
+3. **Run from Nix store**:
+   ```bash
+   ./result/bin/obs-cmd --help
+   ```
+
+#### Nix Flakes
+
+This project uses Nix Flakes for reproducible builds. The flake provides:
+- `obs-cmd` package: Build release binary
+- `devShell`: Development environment with Rust tools and dependencies
+
+See [flake.nix](./flake.nix) for full configuration.
 
 ## Donations
 

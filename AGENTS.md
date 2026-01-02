@@ -75,6 +75,8 @@ src/
 - **Scene Collections**: List, create, switch between scene collections
 
 ## Development Commands
+
+### Traditional Rust Development
 ```bash
 # Build and run
 cargo run                    # Build and run locally
@@ -92,6 +94,22 @@ cargo deny check             # License and dependency checks
 
 # Installation
 cargo install --path .       # Install locally
+```
+
+### Nix Development
+```bash
+# Nix development (alternative)
+nix develop                  # Enter development shell
+nix build                    # Build reproducible package
+nix flake check             # Validate flake configuration
+
+# Run from Nix store
+./result/bin/obs-cmd --help
+
+# Code quality (within nix develop)
+cargo fmt                    # Format code
+cargo clippy -- -D warnings  # Lint with strict warnings
+cargo test                   # Run tests
 ```
 
 ## Release Configuration

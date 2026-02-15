@@ -4,7 +4,7 @@ use crate::error::Result;
 use crate::handlers::{
     audio::AudioHandler, config::ProfileHandler, config::RecordDirectoryHandler,
     config::StreamServiceHandler, config::VideoSettingsHandler, filters::FilterHandler,
-    general::HotkeyHandler, general::InfoHandler, inputs::InputCmdHandler,
+    general::HotkeyHandler, general::HotkeyLister, general::InfoHandler, inputs::InputCmdHandler,
     media::MediaInputHandler, recording::RecordingHandler, replay_buffer::ReplayBufferHandler,
     scene_collections::SceneCollectionHandler, scene_items::SceneItemHandler, scenes::SceneHandler,
     sources::SourceHandler, streaming::StreamingHandler, ui::FullscreenProjectorHandler,
@@ -80,6 +80,7 @@ pub async fn handle_commands(client: &Client, commands: &Commands) -> Result<()>
         Commands::SceneItem(action) => Box::new(SceneItemHandler {
             action: action.clone(),
         }),
+        Commands::ListHotkeys => Box::new(HotkeyLister),
         Commands::TriggerHotkey { name } => Box::new(HotkeyHandler { name: name.clone() }),
         Commands::FullscreenProjector { monitor_index } => Box::new(FullscreenProjectorHandler {
             monitor_index: *monitor_index,

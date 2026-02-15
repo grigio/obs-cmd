@@ -367,6 +367,8 @@ pub enum Commands {
     #[clap(subcommand)]
     SceneItem(SceneItem),
 
+    ListHotkeys,
+
     TriggerHotkey {
         name: String,
     },

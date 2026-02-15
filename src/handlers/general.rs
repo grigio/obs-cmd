@@ -2,6 +2,24 @@ use crate::error::Result;
 use crate::handlers::CommandHandler;
 use obws::Client;
 
+// Handler to list hotkeys
+pub struct HotkeyLister;
+
+#[async_trait::async_trait]
+impl CommandHandler for HotkeyLister {
+    async fn execute(&self, client: &Client) -> Result<()> {
+        let hotkeys = client.hotkeys().list().await?;
+        for hotkey in hotkeys {
+            println!("{}", hotkey);
+        }
+        Ok(())
+    }
+
+    fn description(&self) ->  &'static str {
+        "Lists All Hotkeys"
+    }
+}
+
 /// Handler for hotkey trigger commands
 pub struct HotkeyHandler {
     pub name: String,

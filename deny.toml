@@ -13,9 +13,6 @@ multiple-versions = "deny"
 wildcards = "allow"
 deny = [
     # Common duplicates that should be avoided
-    { name = "log", use-installed-if-available = true },
-    { name = "serde", use-installed-if-available = true },
-    { name = "tokio", use-installed-if-available = true },
 ]
 skip = [
     { name = "windows-sys", version = ">=0.52.0,<1.0.0" },

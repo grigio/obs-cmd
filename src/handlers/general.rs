@@ -15,7 +15,7 @@ impl CommandHandler for HotkeyLister {
         Ok(())
     }
 
-    fn description(&self) ->  &'static str {
+    fn description(&self) -> &'static str {
         "Lists All Hotkeys"
     }
 }

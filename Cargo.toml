@@ -1,6 +1,6 @@
 [package]
 name = "obs-cmd"
-version = "0.31.0"
+version = "0.31.1"
 edition = "2021"
 description = "A minimal command to control obs via obs-websocket"
 authors = ["Luigi Maselli <luigi@grigio.org>"]

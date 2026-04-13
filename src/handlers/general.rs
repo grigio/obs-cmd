@@ -54,10 +54,11 @@ impl CommandHandler for InfoHandler {
             .version()
             .await
             .map_err(|e| crate::error::ObsCmdError::ConnectionError(e))?;
-        println!("OBS Studio Version: {}", version.obs_version);
+        println!("OBS Studio Version: {}", version.obs_studio_version);
         println!("OBS WebSocket Version: {}", version.obs_web_socket_version);
         println!("RPC Version: {}", version.rpc_version);
         println!("Platform: {}", version.platform);
+        println!("Platform Description: {}", version.platform_description);
         println!(
             "Available Requests: {} total",
             version.available_requests.len()

@@ -1,6 +1,6 @@
 [package]
 name = "obs-cmd"
-version = "0.31.3"
+version = "1.0.0"
 edition = "2021"
 description = "A minimal command to control obs via obs-websocket"
 authors = ["Luigi Maselli <luigi@grigio.org>"]
@@ -12,7 +12,7 @@ name = "obs-cmd"
 
 [dependencies]
 tokio = { version = "1.42", features = ["rt-multi-thread", "macros", "time"], default-features = false }
-obws = "0.14"
+obws = "0.15"
 clap = { version = "4.5", features = ["derive", "env"] }
 url = "2.5"
 time = "0.3.47"

@@ -2,36 +2,14 @@
 allow = [
     "MIT",
     "Apache-2.0",
-    "BSD-2-Clause",
+    "BSD-3-Clause",
     "Unicode-3.0",
     "Unlicense",
-    "BSL-1.0"
 ]
 
 [bans]
 multiple-versions = "deny"
 wildcards = "allow"
-deny = [
-    # Common duplicates that should be avoided
-]
-skip = [
-    { name = "windows-sys", version = ">=0.52.0,<1.0.0" },
-    # Allow known acceptable duplicates for CLI tools
-    { name = "hashbrown" },
-    { name = "itertools" },
-    { name = "smallvec" },
-    { name = "unicode-width" },
-    { name = "syn" },
-    { name = "quote" },
-    { name = "proc-macro2" },
-    { name = "indexmap" },
-    { name = "cfg-expr" },
-    { name = "parking_lot" },
-    { name = "tracing" },
-    { name = "futures" },
-    { name = "bytes" },
-    { name = "bitflags" },
-]
 
 [sources]
 allow-registry = ["https://github.com/rust-lang/crates.io-index"]

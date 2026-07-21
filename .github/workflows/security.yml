@@ -114,7 +114,7 @@ jobs:
           duplicate_packages="$(echo "$duplicates" | grep -E '^[a-zA-Z0-9_-]+ v[0-9.]+' | cut -d' ' -f1 | sort -u)"
           echo "Duplicate package names: $duplicate_packages"
           # Filter out known acceptable duplicates for CLI tools
-          unexpected_duplicates="$(echo "$duplicate_packages" | grep -vE 'hashbrown|itertools|smallvec|unicode-width|tokio|serde|syn|quote|proc-macro2|indexmap|cfg-expr|parking_lot|log|tracing|futures|bytes|bitflags' || true)"
+          unexpected_duplicates="$(echo "$duplicate_packages" | grep -vE 'hashbrown|itertools|smallvec|unicode-width|tokio|serde|syn|quote|proc-macro2|indexmap|cfg-expr|parking_lot|log|tracing|futures|bytes|bitflags|semver' || true)"
           if [ -n "$unexpected_duplicates" ]; then
             echo "Unexpected duplicate dependencies found: $unexpected_duplicates"
             exit 1

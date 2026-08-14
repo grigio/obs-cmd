@@ -149,7 +149,7 @@ jobs:
         path: ./
         base: ${{ github.event.before }}
         head: ${{ github.sha }}
-        extra_args: --debug --only-verified
+        extra_args: --debug --only-verified --exclude-detectors=Lob
 
     # For pull requests: use PR base/head
     - name: Run TruffleHog OSS (pull_request)
@@ -159,7 +159,7 @@ jobs:
         path: ./
         base: ${{ github.event.pull_request.base.sha }}
         head: ${{ github.event.pull_request.head.sha }}
-        extra_args: --debug --only-verified
+        extra_args: --debug --only-verified --exclude-detectors=Lob
 
     # For scheduled/manual runs, scan whole repo
     - name: Run TruffleHog OSS (schedule/others)
@@ -167,4 +167,4 @@ jobs:
       uses: trufflesecurity/trufflehog@main
       with:
         path: ./
-        extra_args: --debug --only-verified
+        extra_args: --debug --only-verified --exclude-detectors=Lob

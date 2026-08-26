@@ -40,6 +40,11 @@ pub enum ObsCmdError {
     #[error("No replay buffer recording found. Start replay buffer first")]
     NoLastReplay,
 
+    #[error(
+        "Replay buffer is not active. Start it with `obs-cmd replay start` before saving. If length is incorrect, check OBS Settings → Output → Replay Buffer: Maximum Replay Time and Memory Limit, then restart the buffer (replay stop && replay start)"
+    )]
+    ReplayBufferNotActive,
+
     #[error("Connection timed out after {timeout} seconds. Check OBS is running and WebSocket is enabled")]
     ConnectionTimeout { timeout: u64 },
 

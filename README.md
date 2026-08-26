@@ -324,6 +324,7 @@ obs-cmd info
 - **Authentication failed**: Check password in OBS WebSocket settings
 - **Invalid URL format**: Use `obsws://hostname:port/password` format
 - **Chapter creation failed**: Ensure recording is active and using Hybrid MP4 format
+- **Replay buffer saves wrong length (e.g. 3-4 mins vs expected 60s)**: Replay length is controlled by OBS, not obs-cmd. Verify `OBS Settings → Output → Replay Buffer → Maximum Replay Time` and `Memory Limit`, then restart the buffer: `obs-cmd replay stop && obs-cmd replay start`. The buffer must be restarted after changing settings for the new limits to take effect (see [#103](https://github.com/grigio/obs-cmd/issues/103)).
 
 ### Debug Mode
 Set environment variable for verbose output:

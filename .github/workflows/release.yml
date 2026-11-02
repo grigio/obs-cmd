@@ -73,10 +73,6 @@ jobs:
             arch: arm64
             os: macos
             runner: macos-latest
-          - target: x86_64-unknown-freebsd
-            arch: x64
-            os: freebsd
-            runner: ubuntu-latest
     runs-on: ${{ matrix.runner }}
     
     steps:
@@ -88,13 +84,11 @@ jobs:
           targets: ${{ matrix.target }}
           
       - name: Security audit
-        if: matrix.os != 'freebsd'
         run: |
           cargo install cargo-audit --quiet
           cargo audit
           
       - name: Cache cargo registry
-        if: matrix.os != 'freebsd'
         uses: actions/cache@v4
         with:
           path: |
@@ -106,30 +100,11 @@ jobs:
             ${{ runner.os }}-${{ matrix.target }}-cargo-
             
       - name: Build release binary
-        if: matrix.os != 'freebsd'
         run: |
           cargo build --release --target ${{ matrix.target }}
           
-      - name: Build and create release archive (FreeBSD)
-        if: matrix.os == 'freebsd'
-        uses: vmactions/freebsd-vm@v1
-        with:
-          release: '15.0'
-          usesh: true
-          env: |
-            IGNORE_OSVERSION=yes
-          prepare: |
-            IGNORE_OSVERSION=yes pkg update -f
-            IGNORE_OSVERSION=yes pkg install -y rust
-          run: |
-            cargo build --release --target ${{ matrix.target }}
-            mkdir -p release
-            cp target/${{ matrix.target }}/release/obs-cmd release/
-            strip release/obs-cmd || true
-            tar -czf obs-cmd-${{ matrix.arch }}-${{ matrix.os }}.tar.gz -C release obs-cmd
-             
       - name: Create release archive (Unix)
-        if: matrix.os != 'windows' && matrix.os != 'freebsd'
+        if: matrix.os != 'windows'
         run: |
           mkdir -p release
           cp target/${{ matrix.target }}/release/obs-cmd release/

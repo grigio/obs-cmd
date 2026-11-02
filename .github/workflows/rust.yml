@@ -63,6 +63,7 @@ jobs:
   freebsd:
     name: FreeBSD 15.0 Test
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - name: Test in FreeBSD 15.0

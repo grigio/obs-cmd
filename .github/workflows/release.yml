@@ -116,15 +116,17 @@ jobs:
         with:
           release: '15.0'
           usesh: true
+          env: |
+            IGNORE_OSVERSION=yes
           prepare: |
-            pkg update -f
-            pkg install -y rust
+            IGNORE_OSVERSION=yes pkg update -f
+            IGNORE_OSVERSION=yes pkg install -y rust
           run: |
             cargo build --release --target ${{ matrix.target }}
             mkdir -p release
             cp target/${{ matrix.target }}/release/obs-cmd release/
             strip release/obs-cmd || true
-             tar -czf obs-cmd-${{ matrix.arch }}-${{ matrix.os }}.tar.gz -C release obs-cmd
+            tar -czf obs-cmd-${{ matrix.arch }}-${{ matrix.os }}.tar.gz -C release obs-cmd
              
       - name: Create release archive (Unix)
         if: matrix.os != 'windows' && matrix.os != 'freebsd'

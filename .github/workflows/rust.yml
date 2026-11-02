@@ -70,11 +70,13 @@ jobs:
         with:
           release: '15.0'
           usesh: true
+          env: |
+            IGNORE_OSVERSION=yes
           prepare: |
-            pkg update -f
-            pkg install -y rust pkgconf
+            IGNORE_OSVERSION=yes pkg update -f
+            IGNORE_OSVERSION=yes pkg install -y rust pkgconf
             # Install additional build dependencies that might be needed
-            pkg install -y openssl cmake gmake
+            IGNORE_OSVERSION=yes pkg install -y openssl cmake gmake
           run: |
             rustc --version
             cargo --version

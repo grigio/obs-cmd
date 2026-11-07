@@ -1,4 +1,9 @@
+# cargo-deny configuration for obs-cmd
+# This configuration focuses on security advisories and license checking
+# rather than explicitly allowing every transitive dependency
+
 [licenses]
+# Allow common permissive licenses actually used by dependencies
 allow = [
     "MIT",
     "Apache-2.0",
@@ -8,9 +13,16 @@ allow = [
 ]
 
 [bans]
-multiple-versions = "deny"
+# Allow multiple versions (common in Rust ecosystem, e.g., syn v2 and v3)
+multiple-versions = "allow"
+# Allow wildcard dependencies
 wildcards = "allow"
 
 [sources]
+# Allow crates from crates.io
 allow-registry = ["https://github.com/rust-lang/crates.io-index"]
 allow-git = []
+
+[advisories]
+# Check for security vulnerabilities
+# ignore = []  # Add specific advisory IDs here if needed

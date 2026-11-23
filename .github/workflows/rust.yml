@@ -70,23 +70,20 @@ jobs:
         uses: vmactions/freebsd-vm@v1
         with:
           release: '15.0'
-          usesh: true
-          env: |
+          envs: |
             IGNORE_OSVERSION=yes
           prepare: |
             IGNORE_OSVERSION=yes pkg update -f
-            IGNORE_OSVERSION=yes pkg install -y rust pkgconf
-            # Install additional build dependencies that might be needed
-            IGNORE_OSVERSION=yes pkg install -y openssl cmake gmake
+            IGNORE_OSVERSION=yes pkg install -y curl ca_root_nss
           run: |
+            # Install Rust via rustup: the pkg rust package can be built against
+            # a newer base libc than the VM image provides (FBSD_1.9 not found).
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
+            . "$HOME/.cargo/env"
             rustc --version
             cargo --version
             pwd
             ls -lah
-            # Set environment variables for FreeBSD
-            export OPENSSL_DIR=/usr/local
-            export OPENSSL_LIB_DIR=/usr/local/lib
-            export OPENSSL_INCLUDE_DIR=/usr/local/include
             # Build and test only (fmt/clippy already done in main test job)
             cargo build --verbose
             cargo test --verbose

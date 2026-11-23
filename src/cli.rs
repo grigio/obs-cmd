@@ -556,7 +556,7 @@ pub enum MuteAction {
     Status,
 }
 
-/// Parses duration strings in [hh:]mm:ss format.
+/// Parses duration strings in `[hh:]mm:ss` format.
 ///
 /// This function converts human-readable time strings into Duration objects.
 /// Supports both minute:second and hour:minute:second formats.

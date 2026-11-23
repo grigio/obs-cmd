@@ -1,5 +1,8 @@
 /target
 
+# Nix build output
+result
+
 # Documentation files
 TODO.md
 

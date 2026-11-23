@@ -14,7 +14,7 @@ name = "obs-cmd"
 tokio = { version = "1.42", features = ["rt-multi-thread", "macros", "time"], default-features = false }
 obws = "0.15"
 clap = { version = "4.5", features = ["derive", "env"] }
-url = "2.5"
+url = "2.5.9"
 time = "0.3.47"
 thiserror = "2.0"
 async-trait = "0.1"

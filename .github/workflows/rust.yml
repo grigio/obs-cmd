@@ -70,8 +70,6 @@ jobs:
         uses: vmactions/freebsd-vm@v1
         with:
           release: '15.0'
-          envs: |
-            IGNORE_OSVERSION=yes
           prepare: |
             IGNORE_OSVERSION=yes pkg update -f
             IGNORE_OSVERSION=yes pkg install -y curl ca_root_nss
